@@ -18,10 +18,20 @@ class Config:
         self.play = PlayConfig()
         self.play_data = PlayDataConfig()
         self.trainer = TrainerConfig()
+        self.eval = EvaluateConfig()
 
 
 class Options:
     new = False
+
+
+class EvaluateConfig:
+    def __init__(self):
+        self.game_num = 400
+        self.replace_rate = 0.55
+        self.play_config = PlayConfig()
+        self.play_config.change_tau_turn = 0
+        self.play_config.noise_eps = 0
 
 
 class PlayDataConfig:

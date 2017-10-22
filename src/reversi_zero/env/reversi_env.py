@@ -65,11 +65,11 @@ class ReversiEnv:
         elif bit_count(find_correct_moves(own, enemy)) > 0:  # 相手にはないが自分には合法手がある
             pass
         else:  # お互いに合法手がない
-            self.game_over()
+            self._game_over()
 
         return self.board, {}
 
-    def game_over(self):
+    def _game_over(self):
         self.done = True
         if self.winner is None:
             black_num, white_num = self.board.number_of_black_and_white
@@ -86,7 +86,7 @@ class ReversiEnv:
     def illegal_move_to_lose(self, action):
         logger.warning(f"Illegal action={action}, No Flipped!")
         self.winner = another_player(self.next_player)
-        self.game_over()
+        self._game_over()
 
     def get_own_and_enemy(self):
         if self.next_player == Player.black:
@@ -108,6 +108,10 @@ class ReversiEnv:
 
     @property
     def observation(self):
+        """
+
+        :rtype: Board
+        """
         return self.board
 
 
