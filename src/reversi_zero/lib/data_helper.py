@@ -14,6 +14,12 @@ def get_game_data_filenames(rc: ResourceConfig):
     return files
 
 
+def get_next_generation_model_dirs(rc: ResourceConfig):
+    dir_pattern = os.path.join(rc.next_generation_model_dir, rc.next_generation_model_dirname_tmpl % "*")
+    dirs = list(sorted(glob(dir_pattern)))
+    return dirs
+
+
 def write_game_data_to_file(path, data):
     with open(path, "wt") as f:
         json.dump(data, f)

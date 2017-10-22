@@ -44,7 +44,8 @@ class ReversiModel:
         x = BatchNormalization(axis=1)(x)
         x = Activation("relu")(x)
         x = Flatten()(x)
-        policy_out = Dense(8*8, kernel_regularizer=l2(mc.l2_reg), activation="softmax")(x)  # no output for 'pass'
+        # no output for 'pass'
+        policy_out = Dense(8*8, kernel_regularizer=l2(mc.l2_reg), activation="softmax", name="policy_out")(x)
 
         # for value output
         x = Conv2D(filters=1, kernel_size=1, data_format="channels_first", kernel_regularizer=l2(mc.l2_reg))(res_out)
@@ -52,7 +53,7 @@ class ReversiModel:
         x = Activation("relu")(x)
         x = Flatten()(x)
         x = Dense(mc.value_fc_size, kernel_regularizer=l2(mc.l2_reg), activation="relu")(x)
-        value_out = Dense(1, kernel_regularizer=l2(mc.l2_reg), activation="tanh")(x)
+        value_out = Dense(1, kernel_regularizer=l2(mc.l2_reg), activation="tanh", name="value_out")(x)
 
         self.model = Model(in_x, [policy_out, value_out], name="reversi_model")
 
@@ -102,10 +103,8 @@ class ReversiModel:
 
 def objective_function_for_policy(y_true, y_pred):
     # can use categorical_crossentropy??
-    return K.sum(y_true * K.log(y_pred + K.epsilon()))
+    return K.sum(-y_true * K.log(y_pred + K.epsilon()), axis=-1)
 
 
 def objective_function_for_value(y_true, y_pred):
     return mean_squared_error(y_true, y_pred)
-
-

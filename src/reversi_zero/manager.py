@@ -3,7 +3,7 @@ import argparse
 from .lib.logger import setup_logger
 from .config import Config
 
-CMD_LIST = ['self', 'opt']
+CMD_LIST = ['self', 'opt', 'eval']
 
 
 def create_parser():
@@ -31,3 +31,6 @@ def start():
     elif args.cmd == 'opt':
         from .worker import optimize
         return optimize.start(config)
+    elif args.cmd == 'eval':
+        from .worker import evaluate
+        return evaluate.start(config)
