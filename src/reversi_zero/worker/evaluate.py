@@ -6,7 +6,7 @@ from time import sleep
 from reversi_zero.agent.model import ReversiModel
 from reversi_zero.agent.player import ReversiPlayer
 from reversi_zero.config import Config
-from reversi_zero.env.reversi_env import ReversiEnv, Player
+from reversi_zero.env.reversi_env import ReversiEnv, Player, Winner
 from reversi_zero.lib.data_helper import get_next_generation_model_dirs
 from reversi_zero.lib.model_helpler import save_as_best_model, load_best_model_weight
 
@@ -47,7 +47,9 @@ class EvaluateWorker:
             logger.debug(f"game {game_idx}: ng_win={ng_win}")
             if ng_win is not None:
                 results.append(ng_win)
-        return sum(results) / len(results) >= self.config.eval.replace_rate
+        winning_rate = sum(results) / len(results)
+        logger.debug(f"winning rate {winning_rate*100:.1f}%")
+        return winning_rate >= self.config.eval.replace_rate
 
     def play_game(self, best_model, ng_model):
         env = ReversiEnv().reset()
@@ -68,12 +70,12 @@ class EvaluateWorker:
                 action = white.action(observation.white, observation.black)
             observation, info = env.step(action)
 
-        if env.winner == Player.black:
+        if env.winner == Winner.black:
             if best_is_black:
                 return 0
             else:
                 return 1
-        elif env.winner == Player.white:
+        elif env.winner == Winner.white:
             if best_is_black:
                 return 1
             else:

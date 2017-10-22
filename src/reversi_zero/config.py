@@ -27,7 +27,7 @@ class Options:
 
 class EvaluateConfig:
     def __init__(self):
-        self.game_num = 400
+        self.game_num = 100
         self.replace_rate = 0.55
         self.play_config = PlayConfig()
         self.play_config.change_tau_turn = 0
