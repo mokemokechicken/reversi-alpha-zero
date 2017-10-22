@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from logging import getLogger
+from time import sleep
 
 import keras.backend as K
 import numpy as np
@@ -18,7 +19,7 @@ logger = getLogger(__name__)
 
 
 def start(config: Config):
-    tf_util.set_session_config(per_process_gpu_memory_fraction=0.33, allow_soft_placement=True)
+    tf_util.set_session_config(per_process_gpu_memory_fraction=0.6, allow_growth=True)
     return OptimizeWorker(config).start()
 
 
@@ -41,7 +42,11 @@ class OptimizeWorker:
 
         while True:
             self.load_play_data()
-            self.update_learning_rate(total_steps)  # TODO: 中断からの再開をどう扱うか
+            if self.dataset_size < 100000:
+                logger.info(f"dataset_size={self.dataset_size} is less then 100000")
+                sleep(60)
+                continue
+            self.update_learning_rate(total_steps)
             steps = self.train_epoch(self.config.trainer.epoch_to_checkpoint)
             total_steps += steps
 
@@ -66,12 +71,15 @@ class OptimizeWorker:
         # ~400k: 1e-2
         # 400k~600k: 1e-3
         # 600k~: 1e-4
+
         if total_steps < 400000:
-            K.set_value(self.optimizer.lr, 1e-2)
+            lr = 1e-2
         elif total_steps < 600000:
-            K.set_value(self.optimizer.lr, 1e-3)
+            lr = 1e-3
         else:
-            K.set_value(self.optimizer.lr, 1e-4)
+            lr = 1e-4
+        K.set_value(self.optimizer.lr, lr)
+        logger.debug(f"total step={total_steps}, set learning rate to {lr}")
 
     def save_current_model(self):
         rc = self.config.resource
@@ -93,6 +101,12 @@ class OptimizeWorker:
         policy_ary = np.concatenate(policy_ary_list)
         z_ary = np.concatenate(z_ary_list)
         return state_ary, policy_ary, z_ary
+
+    @property
+    def dataset_size(self):
+        if self.dataset is None:
+            return 0
+        return len(self.dataset[0])
 
     def load_model(self):
         from reversi_zero.agent.model import ReversiModel

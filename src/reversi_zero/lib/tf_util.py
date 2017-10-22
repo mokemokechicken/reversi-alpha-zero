@@ -1,8 +1,9 @@
-def set_session_config(per_process_gpu_memory_fraction=None, allow_soft_placement=None):
+def set_session_config(per_process_gpu_memory_fraction=None, allow_growth=None):
     """
 
+    :param allow_growth: 必要になったらGPUメモリを確保する
     :param float per_process_gpu_memory_fraction: GPUのメモリ使用率を0~1で指定
-    :param bool allow_soft_placement:  CPU上にメモリを確保するか？
+
     :return:
     """
     import tensorflow as tf
@@ -11,7 +12,7 @@ def set_session_config(per_process_gpu_memory_fraction=None, allow_soft_placemen
     config = tf.ConfigProto(
         gpu_options=tf.GPUOptions(
             per_process_gpu_memory_fraction=per_process_gpu_memory_fraction,
-            allow_soft_placement=allow_soft_placement,
+            allow_growth=allow_growth,
         )
     )
     sess = tf.Session(config=config)

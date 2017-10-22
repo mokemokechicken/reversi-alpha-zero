@@ -7,6 +7,7 @@ from reversi_zero.agent.model import ReversiModel
 from reversi_zero.agent.player import ReversiPlayer
 from reversi_zero.config import Config
 from reversi_zero.env.reversi_env import ReversiEnv, Player, Winner
+from reversi_zero.lib import tf_util
 from reversi_zero.lib.data_helper import get_next_generation_model_dirs
 from reversi_zero.lib.model_helpler import save_as_best_model, load_best_model_weight
 
@@ -14,6 +15,7 @@ logger = getLogger(__name__)
 
 
 def start(config: Config):
+    tf_util.set_session_config(per_process_gpu_memory_fraction=0.2)
     return EvaluateWorker(config).start()
 
 
@@ -94,7 +96,8 @@ class EvaluateWorker:
             dirs = get_next_generation_model_dirs(self.config.resource)
             if dirs:
                 break
-            sleep(10)
+            logger.info(f"There is no next generation model to evaluate")
+            sleep(60)
         model_dir = dirs[0]
         config_path = os.path.join(model_dir, rc.next_generation_model_config_filename)
         weight_path = os.path.join(model_dir, rc.next_generation_model_weight_filename)
