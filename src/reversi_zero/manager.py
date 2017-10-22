@@ -10,6 +10,7 @@ def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("cmd", help="what to do", choices=CMD_LIST)
     parser.add_argument("--new", help="run from new best model", action="store_true")
+    parser.add_argument("--type", help="use normal setting", default="mini")
     return parser
 
 
@@ -22,8 +23,10 @@ def setup(config: Config, args):
 def start():
     parser = create_parser()
     args = parser.parse_args()
+    config_type = args.type
 
-    config = Config()
+    config = Config(config_type=config_type)
+
     setup(config, args)
     if args.cmd == "self":
         from .worker import self_play

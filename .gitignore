@@ -19,3 +19,4 @@ tmp.*
 video/*
 *.h5
 logs/
+*.sh
