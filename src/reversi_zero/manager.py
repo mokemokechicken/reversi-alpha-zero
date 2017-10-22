@@ -1,7 +1,11 @@
 import argparse
 
+from logging import getLogger
+
 from .lib.logger import setup_logger
 from .config import Config
+
+logger = getLogger(__name__)
 
 CMD_LIST = ['self', 'opt', 'eval']
 
@@ -10,7 +14,7 @@ def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("cmd", help="what to do", choices=CMD_LIST)
     parser.add_argument("--new", help="run from new best model", action="store_true")
-    parser.add_argument("--type", help="use normal setting", default="mini")
+    parser.add_argument("--type", help="use normal setting", default="normal")
     return parser
 
 
@@ -26,8 +30,10 @@ def start():
     config_type = args.type
 
     config = Config(config_type=config_type)
-
     setup(config, args)
+
+    logger.info(f"config type: {config_type}")
+
     if args.cmd == "self":
         from .worker import self_play
         return self_play.start(config)

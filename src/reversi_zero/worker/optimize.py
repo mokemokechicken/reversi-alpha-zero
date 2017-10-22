@@ -9,6 +9,7 @@ from keras.optimizers import SGD
 from reversi_zero.agent.model import ReversiModel, objective_function_for_policy, \
     objective_function_for_value
 from reversi_zero.config import Config
+from reversi_zero.lib import tf_util
 from reversi_zero.lib.bitboard import bit_to_array
 from reversi_zero.lib.data_helper import get_game_data_filenames, read_game_data_from_file
 from reversi_zero.lib.model_helpler import load_best_model_weight
@@ -17,6 +18,7 @@ logger = getLogger(__name__)
 
 
 def start(config: Config):
+    tf_util.set_session_config(per_process_gpu_memory_fraction=0.33, allow_soft_placement=True)
     return OptimizeWorker(config).start()
 
 

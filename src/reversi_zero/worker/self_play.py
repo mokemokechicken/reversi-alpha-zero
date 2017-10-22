@@ -7,6 +7,7 @@ from reversi_zero.agent.player import ReversiPlayer
 from reversi_zero.config import Config
 from reversi_zero.env.reversi_env import Board, Winner
 from reversi_zero.env.reversi_env import ReversiEnv, Player
+from reversi_zero.lib import tf_util
 from reversi_zero.lib.data_helper import get_game_data_filenames, write_game_data_to_file
 from reversi_zero.lib.model_helpler import load_best_model_weight, save_as_best_model, \
     reload_best_model_weight_if_changed
@@ -15,6 +16,7 @@ logger = getLogger(__name__)
 
 
 def start(config: Config):
+    tf_util.set_session_config(per_process_gpu_memory_fraction=0.33, allow_soft_placement=False)
     return SelfPlayWorker(config, env=ReversiEnv()).start()
 
 
@@ -55,6 +57,7 @@ class SelfPlayWorker:
         self.white = ReversiPlayer(self.config, self.model)
         observation = self.env.observation  # type: Board
         while not self.env.done:
+            logger.debug(f"turn={self.env.turn}")
             if self.env.next_player == Player.black:
                 action = self.black.action(observation.black, observation.white)
             else:
