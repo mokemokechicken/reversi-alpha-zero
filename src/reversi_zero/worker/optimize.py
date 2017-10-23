@@ -19,7 +19,7 @@ logger = getLogger(__name__)
 
 
 def start(config: Config):
-    tf_util.set_session_config(per_process_gpu_memory_fraction=0.6, allow_growth=True)
+    tf_util.set_session_config(per_process_gpu_memory_fraction=0.6)
     return OptimizeWorker(config).start()
 
 
@@ -43,7 +43,7 @@ class OptimizeWorker:
         while True:
             self.load_play_data()
             if self.dataset_size < 100000:
-                logger.info(f"dataset_size={self.dataset_size} is less then 100000")
+                logger.info(f"dataset_size={self.dataset_size} is less than 100000")
                 sleep(60)
                 continue
             self.update_learning_rate(total_steps)

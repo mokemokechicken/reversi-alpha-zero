@@ -46,7 +46,7 @@ class SelfPlayWorker:
             start_time = time()
             self.start_game(idx)
             end_time = time()
-            logger.debug(f"play game time={end_time - start_time} sec")
+            logger.debug(f"play game {idx} time={end_time - start_time} sec")
             if (idx % self.config.play_data.nb_game_in_file) == 0:
                 reload_best_model_weight_if_changed(self.model)
             idx += 1
