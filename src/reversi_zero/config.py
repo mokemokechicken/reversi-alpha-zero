@@ -68,8 +68,8 @@ class GuiConfig:
 
 class PlayWithHumanConfig:
     def __init__(self):
-        self.simulation_num_per_move = 50
-        self.parallel_search_num = 8
+        self.simulation_num_per_move = 100
+        self.parallel_search_num = 5
         self.noise_eps = 0
         self.change_tau_turn = 10
 

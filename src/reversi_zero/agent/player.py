@@ -80,7 +80,7 @@ class ReversiPlayer:
 
     async def start_search_my_move(self, own, enemy):
         self.running_simulation_num += 1
-        with await self.sem:
+        with await self.sem:  # reduce parallel search number
             env = ReversiEnv().update(own, enemy, Player.black)
             leaf_v = await self.search_my_move(env, is_root_node=True)
             self.running_simulation_num -= 1
