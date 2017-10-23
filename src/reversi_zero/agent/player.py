@@ -40,6 +40,8 @@ class ReversiPlayer:
         self.expanded = set()
         self.now_expanding = set()
         self.prediction_queue = Queue(self.play_config.prediction_queue_size)
+        self.sem = asyncio.Semaphore(self.play_config.parallel_search_num)
+
         self.moves = []
         self.loop = asyncio.get_event_loop()
         self.running_simulation_num = 0
@@ -77,11 +79,12 @@ class ReversiPlayer:
         return float(np.average([v for v in leaf_v_list if v is not None]))
 
     async def start_search_my_move(self, own, enemy):
-        env = ReversiEnv().update(own, enemy, Player.black)
         self.running_simulation_num += 1
-        leaf_v = await self.search_my_move(env, is_root_node=True)
-        self.running_simulation_num -= 1
-        return leaf_v
+        with await self.sem:
+            env = ReversiEnv().update(own, enemy, Player.black)
+            leaf_v = await self.search_my_move(env, is_root_node=True)
+            self.running_simulation_num -= 1
+            return leaf_v
 
     async def search_my_move(self, env: ReversiEnv, is_root_node=False):
         """

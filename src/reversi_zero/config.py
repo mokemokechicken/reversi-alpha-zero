@@ -69,10 +69,17 @@ class GuiConfig:
 class PlayWithHumanConfig:
     def __init__(self):
         self.simulation_num_per_move = 50
+        self.parallel_search_num = 8
         self.noise_eps = 0
         self.change_tau_turn = 10
 
     def update_play_config(self, pc):
+        """
+
+        :param PlayConfig pc:
+        :return:
+        """
         pc.simulation_num_per_move = self.simulation_num_per_move
         pc.noise_eps = self.noise_eps
         pc.change_tau_turn = self.change_tau_turn
+        pc.parallel_search_num = self.parallel_search_num
