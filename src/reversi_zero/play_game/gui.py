@@ -7,7 +7,7 @@ from wx.core import CommandEvent
 
 from reversi_zero.config import Config, GuiConfig
 from reversi_zero.env.reversi_env import Player
-from reversi_zero.play_game.game_model import PlayWithHuman
+from reversi_zero.play_game.game_model import PlayWithHuman, GameEvent
 
 logger = getLogger(__name__)
 
@@ -55,7 +55,10 @@ class Frame(wx.Frame):
         self.model.add_observer(self.handle_game_event)
 
     def handle_game_event(self, event):
-        pass
+        if event == GameEvent.moved:
+            self.panel.Refresh()
+        elif event == GameEvent.over:
+            self.game_over()
 
     def handle_quit(self, event: CommandEvent):
         self.Close()
@@ -82,16 +85,16 @@ class Frame(wx.Frame):
         self.model.move(x, y)
         self.panel.Refresh()
 
-        # # if game is over then display dialog
-        # if self.reversi.over:
-        #     black = self.reversi.stones(BLACK)
-        #     white = self.reversi.stones(WHITE)
-        #     mes = "black: %d\nwhite: %d\n" % (black, white)
-        #     if black == white:
-        #         mes += "** draw **"
-        #     else:
-        #         mes += "winner: %s" % ["black", "white"][black < white]
-        #     notify("game is over", mes)
+    def game_over(self):
+        # if game is over then display dialog
+
+        black, white = self.model.number_of_black_and_white
+        mes = "black: %d\nwhite: %d\n" % (black, white)
+        if black == white:
+            mes += "** draw **"
+        else:
+            mes += "winner: %s" % ["black", "white"][black < white]
+        notify("game is over", mes)
         # elif self.reversi.passed != None:
         #     notify("passing turn", "pass")
 

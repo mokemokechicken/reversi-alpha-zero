@@ -1,10 +1,15 @@
+import enum
 from logging import getLogger
 
+from reversi_zero.agent.player import ReversiPlayer
 from reversi_zero.config import Config
 from reversi_zero.env.reversi_env import Player, ReversiEnv
 from reversi_zero.lib.bitboard import find_correct_moves
+from reversi_zero.lib.model_helpler import load_best_model_weight
 
 logger = getLogger(__name__)
+
+GameEvent = enum.Enum("GameEvent", "moved over")
 
 
 class PlayWithHuman:
@@ -13,13 +18,32 @@ class PlayWithHuman:
         self.human_color = None
         self.observers = []
         self.env = ReversiEnv().reset()
+        self.model = self._load_model()
+        self.ai = None
 
     def add_observer(self, observer_func):
         self.observers.append(observer_func)
 
+    def notify_all(self, event):
+        for ob_func in self.observers:
+            ob_func(event)
+
     def start_game(self, human_is_black):
         self.human_color = Player.black if human_is_black else Player.white
         self.env = ReversiEnv().reset()
+        self.ai = ReversiPlayer(self.config, self.model)
+        self.play_next_turn()
+
+    def play_next_turn(self):
+        self.notify_all(GameEvent.moved)
+
+        if self.over:
+            self.notify_all(GameEvent.over)
+            return
+
+        if self.next_player != self.human_color:
+            self._move_by_ai()
+            self.play_next_turn()
 
     @property
     def over(self):
@@ -28,6 +52,17 @@ class PlayWithHuman:
     @property
     def next_player(self):
         return self.env.next_player
+
+    def _move_by_ai(self):
+        if self.next_player == self.human_color:
+            return False
+
+        if self.human_color == Player.black:
+            own, enemy = self.env.board.white, self.env.board.black
+        else:
+            own, enemy = self.env.board.black, self.env.board.white
+        action = self.ai.action(own, enemy)
+        self.env.step(action)
 
     def stone(self, px, py):
         """left top=(0, 0), right bottom=(7,7)"""
@@ -39,6 +74,10 @@ class PlayWithHuman:
         elif self.env.board.white & bit:
             return Player.white
         return None
+
+    @property
+    def number_of_black_and_white(self):
+        return self.env.observation.number_of_black_and_white
 
     def available(self, px, py):
         logger.debug(f"is_available=({px},{py})")
@@ -59,3 +98,11 @@ class PlayWithHuman:
             return False
 
         self.env.step(pos)
+        self.play_next_turn()
+
+    def _load_model(self):
+        from reversi_zero.agent.model import ReversiModel
+        model = ReversiModel(self.config)
+        if not load_best_model_weight(model):
+            raise RuntimeError("best model not found!")
+        return model
