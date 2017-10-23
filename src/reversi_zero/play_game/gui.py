@@ -6,4 +6,4 @@ logger = getLogger(__name__)
 
 
 def start(config: Config):
-    return EvaluateWorker(config).start()
+    pass

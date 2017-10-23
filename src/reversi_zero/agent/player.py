@@ -48,37 +48,6 @@ class ReversiPlayer:
         self.moves.append([(own, enemy), list(policy)])
         return int(np.random.choice(range(64), p=policy))
 
-    def finish_game(self, z):
-        """
-
-        :param z: win=1, lose=-1, draw=0
-        :return:
-        """
-        for move in self.moves:
-            move += [z]
-
-    def calc_policy(self, own, enemy):
-        """calc π(a|s0)
-
-        :param own:
-        :param enemy:
-        :return:
-        """
-        pc = self.play_config
-        env = ReversiEnv().update(own, enemy, Player.black)
-        key = self.counter_key(env)
-        if env.turn < pc.change_tau_turn:
-            return self.var_n[key] / np.sum(self.var_n[key])  # tau = 1
-        else:
-            action = np.argmax(self.var_n[key])  # tau = 0
-            ret = np.zeros(64)
-            ret[action] = 1
-            return ret
-
-    @staticmethod
-    def counter_key(env: ReversiEnv):
-        return CounterKey(env.board.black, env.board.white, env.next_player.value)
-
     def search_my_move(self, env: ReversiEnv, is_root_node=False):
         """
 
@@ -116,6 +85,37 @@ class ReversiPlayer:
         w = self.var_w[key][action_t] = self.var_w[key][action_t] + leaf_v
         self.var_q[key][action_t] = w / n
         return leaf_v
+
+    def finish_game(self, z):
+        """
+
+        :param z: win=1, lose=-1, draw=0
+        :return:
+        """
+        for move in self.moves:
+            move += [z]
+
+    def calc_policy(self, own, enemy):
+        """calc π(a|s0)
+
+        :param own:
+        :param enemy:
+        :return:
+        """
+        pc = self.play_config
+        env = ReversiEnv().update(own, enemy, Player.black)
+        key = self.counter_key(env)
+        if env.turn < pc.change_tau_turn:
+            return self.var_n[key] / np.sum(self.var_n[key])  # tau = 1
+        else:
+            action = np.argmax(self.var_n[key])  # tau = 0
+            ret = np.zeros(64)
+            ret[action] = 1
+            return ret
+
+    @staticmethod
+    def counter_key(env: ReversiEnv):
+        return CounterKey(env.board.black, env.board.white, env.next_player.value)
 
     def select_action_q_and_u(self, env, is_root_node):
         key = self.counter_key(env)
