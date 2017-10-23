@@ -5,7 +5,7 @@ from logging import getLogger
 import wx
 from wx.core import CommandEvent
 
-from reversi_zero.config import Config, GuiConfig
+from reversi_zero.config import Config, GuiConfig, PlayWithHumanConfig
 from reversi_zero.env.reversi_env import Player
 from reversi_zero.play_game.game_model import PlayWithHuman, GameEvent
 
@@ -13,6 +13,7 @@ logger = getLogger(__name__)
 
 
 def start(config: Config):
+    PlayWithHumanConfig().update_play_config(config.play)
     reversi_model = PlayWithHuman(config)
     app = wx.App()
     Frame(reversi_model, config.gui).Show()
@@ -55,10 +56,13 @@ class Frame(wx.Frame):
         self.model.add_observer(self.handle_game_event)
 
     def handle_game_event(self, event):
-        if event == GameEvent.moved:
+        if event == GameEvent.update:
             self.panel.Refresh()
+            wx.Yield()
         elif event == GameEvent.over:
             self.game_over()
+        elif event == GameEvent.ai_move:
+            self.ai_move()
 
     def handle_quit(self, event: CommandEvent):
         self.Close()
@@ -68,7 +72,11 @@ class Frame(wx.Frame):
 
     def new_game(self, human_is_black):
         self.model.start_game(human_is_black=human_is_black)
-        self.panel.Refresh()
+        self.model.play_next_turn()
+
+    def ai_move(self):
+        self.model.move_by_ai()
+        self.model.play_next_turn()
 
     def try_move(self, event):
         if self.model.over:
@@ -83,7 +91,7 @@ class Frame(wx.Frame):
             return
 
         self.model.move(x, y)
-        self.panel.Refresh()
+        self.model.play_next_turn()
 
     def game_over(self):
         # if game is over then display dialog

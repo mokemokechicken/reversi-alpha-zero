@@ -9,7 +9,7 @@ from reversi_zero.lib.model_helpler import load_best_model_weight
 
 logger = getLogger(__name__)
 
-GameEvent = enum.Enum("GameEvent", "moved over")
+GameEvent = enum.Enum("GameEvent", "update ai_move over pass")
 
 
 class PlayWithHuman:
@@ -32,18 +32,16 @@ class PlayWithHuman:
         self.human_color = Player.black if human_is_black else Player.white
         self.env = ReversiEnv().reset()
         self.ai = ReversiPlayer(self.config, self.model)
-        self.play_next_turn()
 
     def play_next_turn(self):
-        self.notify_all(GameEvent.moved)
+        self.notify_all(GameEvent.update)
 
         if self.over:
             self.notify_all(GameEvent.over)
             return
 
         if self.next_player != self.human_color:
-            self._move_by_ai()
-            self.play_next_turn()
+            self.notify_all(GameEvent.ai_move)
 
     @property
     def over(self):
@@ -52,17 +50,6 @@ class PlayWithHuman:
     @property
     def next_player(self):
         return self.env.next_player
-
-    def _move_by_ai(self):
-        if self.next_player == self.human_color:
-            return False
-
-        if self.human_color == Player.black:
-            own, enemy = self.env.board.white, self.env.board.black
-        else:
-            own, enemy = self.env.board.black, self.env.board.white
-        action = self.ai.action(own, enemy)
-        self.env.step(action)
 
     def stone(self, px, py):
         """left top=(0, 0), right bottom=(7,7)"""
@@ -97,7 +84,6 @@ class PlayWithHuman:
             return False
 
         self.env.step(pos)
-        self.play_next_turn()
 
     def _load_model(self):
         from reversi_zero.agent.model import ReversiModel
@@ -105,3 +91,15 @@ class PlayWithHuman:
         if not load_best_model_weight(model):
             raise RuntimeError("best model not found!")
         return model
+
+    def move_by_ai(self):
+        if self.next_player == self.human_color:
+            return False
+
+        if self.human_color == Player.black:
+            own, enemy = self.env.board.white, self.env.board.black
+        else:
+            own, enemy = self.env.board.black, self.env.board.white
+        action = self.ai.action(own, enemy)
+        self.env.step(action)
+
