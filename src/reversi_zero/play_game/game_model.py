@@ -80,7 +80,6 @@ class PlayWithHuman:
         return self.env.observation.number_of_black_and_white
 
     def available(self, px, py):
-        logger.debug(f"is_available=({px},{py})")
         pos = int(py * 8 + px)
         if pos < 0 or 64 <= pos:
             return False
