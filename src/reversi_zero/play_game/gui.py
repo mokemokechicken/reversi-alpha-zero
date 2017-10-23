@@ -141,7 +141,13 @@ class Frame(wx.Frame):
                 if c is not None:
                     dc.SetBrush(brushes[c])
                     dc.DrawEllipse(x * px, y * py, px, py)
-        #         elif self.reversi.available(i, j):
-        #             dc.SetBrush(wx.Brush("red"))
-        #             dc.DrawCircle(i * px + px / 2, j * py + py / 2, 3)
-
+                if self.model.last_history:
+                    q_value = self.model.last_history.values[y*8+x]
+                    n_value = self.model.last_history.visit[y*8+x]
+                    dc.SetTextForeground(wx.Colour("blue"))
+                    if n_value:
+                        dc.DrawText(f"{int(n_value):d}", x*px+2, y*py+2)
+                    if q_value:
+                        if q_value < 0:
+                            dc.SetTextForeground(wx.Colour("red"))
+                        dc.DrawText(f"{int(q_value*100):d}", x*px+2, (y+1)*py-16)

@@ -1,6 +1,7 @@
 import enum
 from logging import getLogger
 
+from reversi_zero.agent.player import HistoryItem
 from reversi_zero.agent.player import ReversiPlayer
 from reversi_zero.config import Config
 from reversi_zero.env.reversi_env import Player, ReversiEnv
@@ -21,6 +22,7 @@ class PlayWithHuman:
         self.model = self._load_model()
         self.ai = None  # type: ReversiPlayer
         self.last_evaluation = None
+        self.last_history = None  # type: HistoryItem
 
     def add_observer(self, observer_func):
         self.observers.append(observer_func)
@@ -101,8 +103,8 @@ class PlayWithHuman:
         action = self.ai.action(own, enemy)
         self.env.step(action)
 
-        hist = self.ai.ask_thought_about(own, enemy)
-        self.last_evaluation = hist.values[hist.action]
+        self.last_history = self.ai.ask_thought_about(own, enemy)
+        self.last_evaluation = self.last_history.values[self.last_history.action]
         logger.debug(f"evaluation by ai={self.last_evaluation}")
 
     def get_state_of_next_player(self):

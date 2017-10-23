@@ -19,7 +19,7 @@ logger = getLogger(__name__)
 
 
 def start(config: Config):
-    tf_util.set_session_config(per_process_gpu_memory_fraction=0.6)
+    tf_util.set_session_config(per_process_gpu_memory_fraction=0.59)
     return OptimizeWorker(config).start()
 
 

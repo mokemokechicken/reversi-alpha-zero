@@ -14,7 +14,7 @@ from reversi_zero.lib.bitboard import find_correct_moves, bit_to_array, flip_ver
 
 CounterKey = namedtuple("CounterKey", "black white next_player")
 QueueItem = namedtuple("QueueItem", "state future")
-HistoryItem = namedtuple("HistoryItem", "action policy values")
+HistoryItem = namedtuple("HistoryItem", "action policy values visit")
 
 logger = getLogger(__name__)
 
@@ -61,7 +61,7 @@ class ReversiPlayer:
         action = int(np.random.choice(range(64), p=policy))
         env = ReversiEnv().update(own, enemy, Player.black)
         key = self.counter_key(env)
-        self.thinking_history[(own, enemy)] = HistoryItem(action, policy, list(self.var_q[key]))
+        self.thinking_history[(own, enemy)] = HistoryItem(action, policy, list(self.var_q[key]), list(self.var_n[key]))
         return action
 
     def ask_thought_about(self, own, enemy) -> HistoryItem:
