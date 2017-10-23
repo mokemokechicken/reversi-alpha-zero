@@ -32,6 +32,7 @@ class TrainerConfig:
         self.batch_size = 2048
         self.epoch_to_checkpoint = 1
         self.start_total_steps = 0
+        self.save_model_steps = 1000
 
 
 class ModelConfig:
