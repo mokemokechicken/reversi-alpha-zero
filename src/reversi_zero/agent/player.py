@@ -86,6 +86,35 @@ class ReversiPlayer:
         self.var_q[key][action_t] = w / n
         return leaf_v
 
+    def expand_and_evaluate(self, env):
+        """新しいleaf, doneの場合もある
+
+        update var_p, return leaf_v
+
+        :param ReversiEnv env:
+        :return: leaf_v
+        """
+
+        key = self.counter_key(env)
+        self.expanded.add(key)
+
+        black, white = env.board.black, env.board.white
+        if random() < 0.5:
+            black, white = flip_vertical(black), flip_vertical(white)
+        for i in range(int(random() * 4)):
+            black, white = rotate90(black), rotate90(white)
+
+        black_ary = bit_to_array(black, 64).reshape((8, 8))
+        white_ary = bit_to_array(white, 64).reshape((8, 8))
+
+        if env.next_player == Player.black:
+            leaf_p, leaf_v = self.api.predict(np.array([black_ary, white_ary]))
+        else:
+            leaf_p, leaf_v = self.api.predict(np.array([white_ary, black_ary]))
+
+        self.var_p[key] = leaf_p  # P is value for next_player (black or white)
+        return float(leaf_v)
+
     def finish_game(self, z):
         """
 
@@ -141,32 +170,3 @@ class ReversiPlayer:
         # noinspection PyTypeChecker
         action_t = int(np.argmax(v_))
         return action_t
-
-    def expand_and_evaluate(self, env):
-        """新しいleaf, doneの場合もある
-
-        update var_p, return leaf_v
-
-        :param ReversiEnv env:
-        :return: leaf_v
-        """
-
-        key = self.counter_key(env)
-        self.expanded.add(key)
-
-        black, white = env.board.black, env.board.white
-        if random() < 0.5:
-            black, white = flip_vertical(black), flip_vertical(white)
-        for i in range(int(random() * 4)):
-            black, white = rotate90(black), rotate90(white)
-
-        black_ary = bit_to_array(black, 64).reshape((8, 8))
-        white_ary = bit_to_array(white, 64).reshape((8, 8))
-
-        if env.next_player == Player.black:
-            leaf_p, leaf_v = self.api.predict(np.array([black_ary, white_ary]))
-        else:
-            leaf_p, leaf_v = self.api.predict(np.array([white_ary, black_ary]))
-
-        self.var_p[key] = leaf_p  # P is value for next_player (black or white)
-        return float(leaf_v)
