@@ -14,6 +14,7 @@ class Config:
     def __init__(self, config_type="mini"):
         self.opts = Options()
         self.resource = ResourceConfig()
+        self.gui = GuiConfig()
 
         if config_type == "mini":
             import reversi_zero.configs.mini as c
@@ -57,3 +58,9 @@ class ResourceConfig:
         for d in dirs:
             if not os.path.exists(d):
                 os.makedirs(d)
+
+
+class GuiConfig:
+    def __init__(self):
+        self.window_size = (400, 440)
+        self.window_title = "reversi-zero"

@@ -1,5 +1,4 @@
 from _asyncio import Future
-from asyncio.events import AbstractEventLoop
 from asyncio.queues import Queue
 from collections import defaultdict, namedtuple
 from logging import getLogger
