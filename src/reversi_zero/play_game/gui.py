@@ -14,7 +14,7 @@ logger = getLogger(__name__)
 
 def start(config: Config):
     reversi_model = PlayWithHuman(config)
-    app = wx.PySimpleApp()
+    app = wx.App()
     Frame(reversi_model, config.gui).Show()
     app.MainLoop()
 
@@ -35,7 +35,7 @@ class Frame(wx.Frame):
         self.panel.Bind(wx.EVT_LEFT_DOWN, self.try_move)
         self.panel.Bind(wx.EVT_PAINT, self.refresh)
 
-        # self.new_game(None)
+        self.new_game(human_is_black=True)
         # menu bar
         menu = wx.Menu()
         menu.Append(1, u"New Game(Black)")
@@ -45,9 +45,9 @@ class Frame(wx.Frame):
         menu_bar = wx.MenuBar()
         menu_bar.Append(menu, u"menu")
         self.SetMenuBar(menu_bar)
-        self.Bind(wx.EVT_MENU, self.new_game, id=1)
-        self.Bind(wx.EVT_MENU, self.new_game, id=2)
-        self.Bind(wx.EVT_MENU, self.quit, id=9)
+        self.Bind(wx.EVT_MENU, self.handle_new_game, id=1)
+        self.Bind(wx.EVT_MENU, self.handle_new_game, id=2)
+        self.Bind(wx.EVT_MENU, self.handle_quit, id=9)
 
         # status bar
         self.CreateStatusBar()
@@ -57,14 +57,13 @@ class Frame(wx.Frame):
     def handle_game_event(self, event):
         pass
 
-    def quit(self, event: CommandEvent):
+    def handle_quit(self, event: CommandEvent):
         self.Close()
 
-    def new_game(self, event: CommandEvent):
-        event.GetId()
-        # initialize reversi and refresh screen
-        logger.debug(f"event id={event.GetId()}")
-        human_is_black = event.GetId() == 1
+    def handle_new_game(self, event: CommandEvent):
+        self.new_game(human_is_black=event.GetId() == 1)
+
+    def new_game(self, human_is_black):
         self.model.start_game(human_is_black=human_is_black)
         self.panel.Refresh()
 
@@ -74,8 +73,9 @@ class Frame(wx.Frame):
         # calculate coordinate from window coordinate
         event_x, event_y = event.GetX(), event.GetY()
         w, h = self.panel.GetSize()
-        x = event_x / (w / 8)
-        y = event_y / (h / 8)
+        x = int(event_x / (w / 8))
+        y = int(event_y / (h / 8))
+
         if not self.model.available(x, y):
             return
 
@@ -119,7 +119,7 @@ class Frame(wx.Frame):
                 c = self.model.stone(x, y)
                 if c is not None:
                     dc.SetBrush(brushes[c])
-                    dc.DrawEllipse(y * px, x * py, px, py)
+                    dc.DrawEllipse(x * px, y * py, px, py)
         #         elif self.reversi.available(i, j):
         #             dc.SetBrush(wx.Brush("red"))
         #             dc.DrawCircle(i * px + px / 2, j * py + py / 2, 3)

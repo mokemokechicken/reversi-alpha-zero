@@ -1,12 +1,15 @@
+from logging import getLogger
+
 from reversi_zero.config import Config
 from reversi_zero.env.reversi_env import Player, ReversiEnv
 from reversi_zero.lib.bitboard import find_correct_moves
+
+logger = getLogger(__name__)
 
 
 class PlayWithHuman:
     def __init__(self, config: Config):
         self.config = config
-        self.over = True
         self.human_color = None
         self.observers = []
         self.env = ReversiEnv().reset()
@@ -17,6 +20,10 @@ class PlayWithHuman:
     def start_game(self, human_is_black):
         self.human_color = Player.black if human_is_black else Player.white
         self.env = ReversiEnv().reset()
+
+    @property
+    def over(self):
+        return self.env.done
 
     @property
     def next_player(self):
@@ -34,6 +41,7 @@ class PlayWithHuman:
         return None
 
     def available(self, px, py):
+        logger.debug(f"is_available=({px},{py})")
         pos = int(py * 8 + px)
         if pos < 0 or 64 <= pos:
             return False
