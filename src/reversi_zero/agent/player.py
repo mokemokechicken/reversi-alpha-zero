@@ -14,6 +14,7 @@ from reversi_zero.lib.bitboard import find_correct_moves, bit_to_array, flip_ver
 
 CounterKey = namedtuple("CounterKey", "black white next_player")
 QueueItem = namedtuple("QueueItem", "state future")
+HistoryItem = namedtuple("HistoryItem", "action policy value")
 
 logger = getLogger(__name__)
 
@@ -43,6 +44,8 @@ class ReversiPlayer:
         self.loop = asyncio.get_event_loop()
         self.running_simulation_num = 0
 
+        self.thinking_history = {}  # for fun
+
     def action(self, own, enemy):
         """
 
@@ -50,11 +53,15 @@ class ReversiPlayer:
         :param enemy:  BitBoard
         :return: action: move pos=0 ~ 63 (0=top left, 7 top right, 63 bottom right)
         """
-        self.search_moves(own, enemy)
+        estimated_value = self.search_moves(own, enemy)
         policy = self.calc_policy(own, enemy)
         self.moves.append([(own, enemy), list(policy)])
         action = int(np.random.choice(range(64), p=policy))
+        self.thinking_history[(own, enemy)] = HistoryItem(action, policy, estimated_value)
         return action
+
+    def ask_thought_about(self, own, enemy) -> HistoryItem:
+        return self.thinking_history.get((own, enemy))
 
     def search_moves(self, own, enemy):
         loop = self.loop
@@ -66,13 +73,15 @@ class ReversiPlayer:
             coroutine_list.append(cor)
 
         coroutine_list.append(self.prediction_worker())
-        loop.run_until_complete(asyncio.gather(*coroutine_list))
+        leaf_v_list = loop.run_until_complete(asyncio.gather(*coroutine_list))
+        return float(np.average([v for v in leaf_v_list if v is not None]))
 
     async def start_search_my_move(self, own, enemy):
         env = ReversiEnv().update(own, enemy, Player.black)
         self.running_simulation_num += 1
-        await self.search_my_move(env, is_root_node=True)
+        leaf_v = await self.search_my_move(env, is_root_node=True)
         self.running_simulation_num -= 1
+        return leaf_v
 
     async def search_my_move(self, env: ReversiEnv, is_root_node=False):
         """

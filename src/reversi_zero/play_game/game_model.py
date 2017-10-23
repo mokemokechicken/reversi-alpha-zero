@@ -19,7 +19,8 @@ class PlayWithHuman:
         self.observers = []
         self.env = ReversiEnv().reset()
         self.model = self._load_model()
-        self.ai = None
+        self.ai = None  # type: ReversiPlayer
+        self.last_evaluation = None
 
     def add_observer(self, observer_func):
         self.observers.append(observer_func)
@@ -96,10 +97,18 @@ class PlayWithHuman:
         if self.next_player == self.human_color:
             return False
 
-        if self.human_color == Player.black:
-            own, enemy = self.env.board.white, self.env.board.black
-        else:
-            own, enemy = self.env.board.black, self.env.board.white
+        own, enemy = self.get_state_of_next_player()
         action = self.ai.action(own, enemy)
         self.env.step(action)
+
+        self.last_evaluation = hist = self.ai.ask_thought_about(own, enemy)
+        logger.debug(f"evaluation by ai={hist.value}")
+
+    def get_state_of_next_player(self):
+        if self.next_player == Player.black:
+            own, enemy = self.env.board.black, self.env.board.white
+        else:
+            own, enemy = self.env.board.white, self.env.board.black
+        return own, enemy
+
 
