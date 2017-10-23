@@ -101,8 +101,9 @@ class PlayWithHuman:
         action = self.ai.action(own, enemy)
         self.env.step(action)
 
-        self.last_evaluation = hist = self.ai.ask_thought_about(own, enemy)
-        logger.debug(f"evaluation by ai={hist.value}")
+        hist = self.ai.ask_thought_about(own, enemy)
+        self.last_evaluation = hist.values[hist.action]
+        logger.debug(f"evaluation by ai={self.last_evaluation}")
 
     def get_state_of_next_player(self):
         if self.next_player == Player.black:

@@ -58,6 +58,7 @@ class Frame(wx.Frame):
     def handle_game_event(self, event):
         if event == GameEvent.update:
             self.panel.Refresh()
+            self.update_status_bar()
             wx.Yield()
         elif event == GameEvent.over:
             self.game_over()
@@ -75,6 +76,7 @@ class Frame(wx.Frame):
         self.model.play_next_turn()
 
     def ai_move(self):
+        self.panel.Refresh()
         self.update_status_bar()
         wx.Yield()
         self.model.move_by_ai()
@@ -111,7 +113,7 @@ class Frame(wx.Frame):
     def update_status_bar(self):
         msg = "current player is " + ["White", "Black"][self.model.next_player == Player.black]
         if self.model.last_evaluation:
-            msg += f"|AI Confidence={self.model.last_evaluation.value:.4f}"
+            msg += f"|AI Confidence={self.model.last_evaluation:.4f}"
         self.SetStatusText(msg)
 
     def refresh(self, event):

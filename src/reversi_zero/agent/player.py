@@ -9,12 +9,12 @@ from numpy.random import random
 
 from reversi_zero.agent.api import ReversiModelAPI
 from reversi_zero.config import Config
-from reversi_zero.env.reversi_env import ReversiEnv, Player
+from reversi_zero.env.reversi_env import ReversiEnv, Player, Winner
 from reversi_zero.lib.bitboard import find_correct_moves, bit_to_array, flip_vertical, rotate90
 
 CounterKey = namedtuple("CounterKey", "black white next_player")
 QueueItem = namedtuple("QueueItem", "state future")
-HistoryItem = namedtuple("HistoryItem", "action policy value")
+HistoryItem = namedtuple("HistoryItem", "action policy values")
 
 logger = getLogger(__name__)
 
@@ -55,11 +55,13 @@ class ReversiPlayer:
         :param enemy:  BitBoard
         :return: action: move pos=0 ~ 63 (0=top left, 7 top right, 63 bottom right)
         """
-        estimated_value = self.search_moves(own, enemy)
+        self.search_moves(own, enemy)
         policy = self.calc_policy(own, enemy)
         self.moves.append([(own, enemy), list(policy)])
         action = int(np.random.choice(range(64), p=policy))
-        self.thinking_history[(own, enemy)] = HistoryItem(action, policy, estimated_value)
+        env = ReversiEnv().update(own, enemy, Player.black)
+        key = self.counter_key(env)
+        self.thinking_history[(own, enemy)] = HistoryItem(action, policy, list(self.var_q[key]))
         return action
 
     def ask_thought_about(self, own, enemy) -> HistoryItem:
@@ -75,8 +77,7 @@ class ReversiPlayer:
             coroutine_list.append(cor)
 
         coroutine_list.append(self.prediction_worker())
-        leaf_v_list = loop.run_until_complete(asyncio.gather(*coroutine_list))
-        return float(np.average([v for v in leaf_v_list if v is not None]))
+        loop.run_until_complete(asyncio.gather(*coroutine_list))
 
     async def start_search_my_move(self, own, enemy):
         self.running_simulation_num += 1
@@ -96,9 +97,9 @@ class ReversiPlayer:
         :return:
         """
         if env.done:
-            if env.winner == Player.black:
+            if env.winner == Winner.black:
                 return 1
-            elif env.winner == Player.white:
+            elif env.winner == Winner.white:
                 return -1
             else:
                 return 0
