@@ -45,10 +45,15 @@ class EvaluateWorker:
         results = []
         for game_idx in range(self.config.eval.game_num):
             # ng_win := if ng_model win -> 1, lose -> 0, draw -> None
-            ng_win = self.play_game(self.best_model, ng_model)
-            logger.debug(f"game {game_idx}: ng_win={ng_win}")
+            ng_win, black_is_best, black_white = self.play_game(self.best_model, ng_model)
             if ng_win is not None:
                 results.append(ng_win)
+            winning_rate = sum(results) / len(results)
+            logger.debug(f"game {game_idx}: ng_win={ng_win} black_is_best_model={black_is_best} score={black_white} "
+                         f"winning rate {winning_rate*100:.1f}%")
+            if results.count(0) >= self.config.eval.game_num * (1-self.config.eval.replace_rate):
+                logger.debug(f"lose count reach {results.count(0)} so give up challenge")
+                break
         winning_rate = sum(results) / len(results)
         logger.debug(f"winning rate {winning_rate*100:.1f}%")
         return winning_rate >= self.config.eval.replace_rate
@@ -72,18 +77,18 @@ class EvaluateWorker:
                 action = white.action(observation.white, observation.black)
             observation, info = env.step(action)
 
+        ng_win = None
         if env.winner == Winner.black:
             if best_is_black:
-                return 0
+                ng_win = 0
             else:
-                return 1
+                ng_win = 1
         elif env.winner == Winner.white:
             if best_is_black:
-                return 1
+                ng_win = 1
             else:
-                return 0
-        else:
-            return None
+                ng_win = 0
+        return ng_win, best_is_black, observation.number_of_black_and_white
 
     def load_best_model(self):
         model = ReversiModel(self.config)
