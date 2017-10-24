@@ -119,6 +119,7 @@ python src/reversi_zero/run.py play_gui
 
 <img src="doc/img/play_gui.png">
 
+
 When executed, ordinary reversi board will be displayed and you can play against BestModel.
 After BestModel moves, numbers are displayed on the board.
 Top left numbers(1) mean 'Visit Count (=N(s,a))' of the last search.
