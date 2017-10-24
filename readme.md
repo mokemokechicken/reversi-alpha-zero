@@ -122,8 +122,9 @@ python src/reversi_zero/run.py play_gui
 
 When executed, ordinary reversi board will be displayed and you can play against BestModel.
 After BestModel moves, numbers are displayed on the board.
-Top left numbers(1) mean 'Visit Count (=N(s,a))' of the last search.
-Bottom left numbers(2) mean 'Q Value (=Q(s,a)) on AI side' of the last state and move. The Q values are multiplied by 100.
+
+* Top left numbers(1) mean 'Visit Count (=N(s,a))' of the last search.
+* Bottom left numbers(2) mean 'Q Value (=Q(s,a)) on AI side' of the last state and move. The Q values are multiplied by 100.
 
 ### Note: Mac pyenv environment
 
