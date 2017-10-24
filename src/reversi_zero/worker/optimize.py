@@ -12,7 +12,8 @@ from reversi_zero.agent.model import ReversiModel, objective_function_for_policy
 from reversi_zero.config import Config
 from reversi_zero.lib import tf_util
 from reversi_zero.lib.bitboard import bit_to_array
-from reversi_zero.lib.data_helper import get_game_data_filenames, read_game_data_from_file
+from reversi_zero.lib.data_helper import get_game_data_filenames, read_game_data_from_file, \
+    get_next_generation_model_dirs
 from reversi_zero.lib.model_helpler import load_best_model_weight
 
 logger = getLogger(__name__)
@@ -74,9 +75,9 @@ class OptimizeWorker:
         # 400k~600k: 1e-3
         # 600k~: 1e-4
 
-        if total_steps < 400000:
+        if total_steps < 100000:
             lr = 1e-2
-        elif total_steps < 600000:
+        elif total_steps < 200000:
             lr = 1e-3
         else:
             lr = 1e-4
@@ -113,8 +114,19 @@ class OptimizeWorker:
     def load_model(self):
         from reversi_zero.agent.model import ReversiModel
         model = ReversiModel(self.config)
-        if not load_best_model_weight(model):
-            raise RuntimeError(f"Best model can not loaded!")
+        rc = self.config.resource
+
+        dirs = get_next_generation_model_dirs(rc)
+        if not dirs:
+            logger.debug(f"loading best model")
+            if not load_best_model_weight(model):
+                raise RuntimeError(f"Best model can not loaded!")
+        else:
+            latest_dir = dirs[-1]
+            logger.debug(f"loading latest model")
+            config_path = os.path.join(latest_dir, rc.next_generation_model_config_filename)
+            weight_path = os.path.join(latest_dir, rc.next_generation_model_weight_filename)
+            model.load(config_path, weight_path)
         return model
 
     def load_play_data(self):
