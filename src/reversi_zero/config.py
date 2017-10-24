@@ -63,7 +63,7 @@ class ResourceConfig:
 class GuiConfig:
     def __init__(self):
         self.window_size = (400, 440)
-        self.window_title = "reversi-zero"
+        self.window_title = "reversi-alpha-zero"
 
 
 class PlayWithHumanConfig:
