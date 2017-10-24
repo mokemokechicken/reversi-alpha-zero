@@ -60,11 +60,11 @@ class ReversiEnv:
         self.set_own_and_enemy(own, enemy)
         self.turn += 1
 
-        if bit_count(find_correct_moves(enemy, own)) > 0:  # 合法手がある
+        if bit_count(find_correct_moves(enemy, own)) > 0:  # there are legal moves for enemy.
             self.change_to_next_player()
-        elif bit_count(find_correct_moves(own, enemy)) > 0:  # 相手にはないが自分には合法手がある
+        elif bit_count(find_correct_moves(own, enemy)) > 0:  # there are legal moves for me but enemy.
             pass
-        else:  # お互いに合法手がない
+        else:  # there is no legal moves for me and enemy.
             self._game_over()
 
         return self.board, {}

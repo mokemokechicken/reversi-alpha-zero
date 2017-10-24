@@ -1,8 +1,8 @@
 def set_session_config(per_process_gpu_memory_fraction=None, allow_growth=None):
     """
 
-    :param allow_growth: 必要になったらGPUメモリを確保する
-    :param float per_process_gpu_memory_fraction: GPUのメモリ使用率を0~1で指定
+    :param allow_growth: When necessary, reserve memory
+    :param float per_process_gpu_memory_fraction: specify GPU memory usage as 0 to 1
 
     :return:
     """

@@ -13,8 +13,8 @@ def board_to_string(black, white, with_edge=True, extra=None):
     ..
     56 57 58 59 60 61 62 63
 
-    0が最下位ビット
-    0が左上,63が右下
+    0: Top Left, LSB
+    63: Bottom Right
 
     :param black: bitboard
     :param white: bitboard
@@ -51,19 +51,11 @@ def board_to_string(black, white, with_edge=True, extra=None):
 
 
 def find_correct_moves(own, enemy):
-    """合法手の位置を返す"""
-    left_right_mask = 0x7e7e7e7e7e7e7e7e  # 端の1列が0、それ以外は1
-    top_bottom_mask = 0x00ffffffffffff00  # 一番上と下が0、それ以外は1
+    """return legal moves"""
+    left_right_mask = 0x7e7e7e7e7e7e7e7e  # Both most left-right edge are 0, else 1
+    top_bottom_mask = 0x00ffffffffffff00  # Both most top-bottom edge are 0, else 1
     mask = left_right_mask & top_bottom_mask
     mobility = 0
-    # mobility |= search_offset_left(own, enemy, left_right_mask, 1)  # Left
-    # mobility |= search_offset_left(own, enemy, left_right_mask, 9)  # Left Top
-    # mobility |= search_offset_left(own, enemy, top_bottom_mask, 8)  # Top
-    # mobility |= search_offset_left(own, enemy, top_bottom_mask, 7)  # Top Right
-    # mobility |= search_offset_right(own, enemy, left_right_mask, 1)  # Right
-    # mobility |= search_offset_right(own, enemy, mask, 9)  # Bottom Right
-    # mobility |= search_offset_right(own, enemy, top_bottom_mask, 8)  # Bottom
-    # mobility |= search_offset_right(own, enemy, left_right_mask, 7)  # Left bottom
     mobility |= search_offset_left(own, enemy, left_right_mask, 1)  # Left
     mobility |= search_offset_left(own, enemy, mask, 9)  # Left Top
     mobility |= search_offset_left(own, enemy, top_bottom_mask, 8)  # Top
@@ -76,12 +68,12 @@ def find_correct_moves(own, enemy):
 
 
 def calc_flip(pos, own, enemy):
-    """
+    """return flip stones of enemy by bitboard when I place stone at pos.
 
     :param pos: 0~63
     :param own: bitboard (0=top left, 63=bottom right)
     :param enemy: bitboard
-    :return: 反転するenemyの位置を bitboard で返す
+    :return: flip stones of enemy when I place stone at pos.
     """
     assert 0 <= pos <= 63, f"pos={pos}"
     f1 = _calc_flip_half(pos, own, enemy)
@@ -108,8 +100,8 @@ def search_offset_left(own, enemy, mask, offset):
     t |= e & (t >> offset)
     t |= e & (t >> offset)
     t |= e & (t >> offset)
-    t |= e & (t >> offset)  # 一度にひっくり返せる石は6つまで
-    return blank & (t >> offset)  # 着手出来るのは空白のマスだけ
+    t |= e & (t >> offset)  # Up to six stones can be turned at once
+    return blank & (t >> offset)  # Only the blank squares can be started
 
 
 def search_offset_right(own, enemy, mask, offset):
@@ -120,8 +112,8 @@ def search_offset_right(own, enemy, mask, offset):
     t |= e & (t << offset)
     t |= e & (t << offset)
     t |= e & (t << offset)
-    t |= e & (t << offset)  # 一度にひっくり返せる石は6つまで
-    return blank & (t << offset)  # 着手出来るのは空白のマスだけ
+    t |= e & (t << offset)  # Up to six stones can be turned at once
+    return blank & (t << offset)  # Only the blank squares can be started
 
 
 def flip_vertical(x):

@@ -59,9 +59,12 @@ class ReversiPlayer:
         policy = self.calc_policy(own, enemy)
         self.moves.append([(own, enemy), list(policy)])
         action = int(np.random.choice(range(64), p=policy))
+
+        # this is for play_gui, not necessary when training.
         env = ReversiEnv().update(own, enemy, Player.black)
         key = self.counter_key(env)
         self.thinking_history[(own, enemy)] = HistoryItem(action, policy, list(self.var_q[key]), list(self.var_n[key]))
+
         return action
 
     def ask_thought_about(self, own, enemy) -> HistoryItem:
@@ -133,7 +136,7 @@ class ReversiPlayer:
         return leaf_v
 
     async def expand_and_evaluate(self, env):
-        """新しいleaf, doneの場合もある
+        """expand new leaf
 
         update var_p, return leaf_v
 
@@ -146,6 +149,7 @@ class ReversiPlayer:
 
         black, white = env.board.black, env.board.white
 
+        # (di(p), v) = fθ(di(sL))
         # rotation and flip. flip -> rot.
         is_flip_vertical = random() < 0.5
         rotate_right_num = int(random() * 4)
@@ -176,8 +180,13 @@ class ReversiPlayer:
         return float(leaf_v)
 
     async def prediction_worker(self):
+        """For better performance, queueing prediction requests and predict together in this worker.
+
+        speed up about 45sec -> 15sec for example.
+        :return:
+        """
         q = self.prediction_queue
-        margin = 10
+        margin = 10  # avoid finishing before other searches starting.
         while self.running_simulation_num > 0 or margin > 0:
             if q.empty():
                 if margin > 0:
@@ -203,7 +212,7 @@ class ReversiPlayer:
         :param z: win=1, lose=-1, draw=0
         :return:
         """
-        for move in self.moves:
+        for move in self.moves:  # add this game winner result to all past moves.
             move += [z]
 
     def calc_policy(self, own, enemy):
@@ -247,6 +256,7 @@ class ReversiPlayer:
         if env.next_player == Player.black:
             v_ = (self.var_q[key] + u_ + 1000) * bit_to_array(legal_moves, 64)
         else:
+            # When enemy's selecting action, flip Q-Value.
             v_ = (-self.var_q[key] + u_ + 1000) * bit_to_array(legal_moves, 64)
 
         # noinspection PyTypeChecker
