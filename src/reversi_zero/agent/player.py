@@ -145,10 +145,14 @@ class ReversiPlayer:
         self.now_expanding.add(key)
 
         black, white = env.board.black, env.board.white
-        if random() < 0.5:
+
+        # rotation and flip. flip -> rot.
+        is_flip_vertical = random() < 0.5
+        rotate_right_num = int(random() * 4)
+        if is_flip_vertical:
             black, white = flip_vertical(black), flip_vertical(white)
-        for i in range(int(random() * 4)):
-            black, white = rotate90(black), rotate90(white)
+        for i in range(rotate_right_num):
+            black, white = rotate90(black), rotate90(white)  # rotate90: rotate bitboard RIGHT 1 time
 
         black_ary = bit_to_array(black, 64).reshape((8, 8))
         white_ary = bit_to_array(white, 64).reshape((8, 8))
@@ -156,6 +160,15 @@ class ReversiPlayer:
         future = await self.predict(np.array(state))  # type: Future
         await future
         leaf_p, leaf_v = future.result()
+
+        # reverse rotate and flip about leaf_p
+        if rotate_right_num > 0 or is_flip_vertical:  # reverse rotation and flip. rot -> flip.
+            leaf_p = leaf_p.reshape((8, 8))
+            if rotate_right_num > 0:
+                leaf_p = np.rot90(leaf_p, k=rotate_right_num)  # rot90: rotate matrix LEFT k times
+            if is_flip_vertical:
+                leaf_p = np.flipud(leaf_p)
+            leaf_p = leaf_p.reshape((64, ))
 
         self.var_p[key] = leaf_p  # P is value for next_player (black or white)
         self.expanded.add(key)

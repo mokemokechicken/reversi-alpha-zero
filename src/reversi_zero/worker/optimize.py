@@ -39,7 +39,7 @@ class OptimizeWorker:
     def training(self):
         self.compile_model()
         last_save_step = total_steps = self.config.trainer.start_total_steps
-        min_data_size_to_learn = 10000
+        min_data_size_to_learn = 100000
 
         while True:
             self.load_play_data()
