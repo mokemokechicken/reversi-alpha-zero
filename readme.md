@@ -61,6 +61,14 @@ Create `.env` file and write this.
 KERAS_BACKEND=tensorflow
 ```
 
+### Download Trained BestModel(If needed)
+
+Download trained BestModel for example.
+
+```bash
+sh ./download_best_model.sh
+```
+
 Basic Usages
 ------------
 
