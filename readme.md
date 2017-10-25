@@ -112,7 +112,7 @@ python src/reversi_zero/run.py eval
 ```
 
 When executed, Evaluation will start.
-It evaluates BestModel and the oldest next-generation model by playing about 200 games.
+It evaluates BestModel and the latest next-generation model by playing about 200 games.
 If next-generation model wins, it becomes BestModel. 
 
 ### options

@@ -108,7 +108,7 @@ class EvaluateWorker:
                 break
             logger.info(f"There is no next generation model to evaluate")
             sleep(60)
-        model_dir = dirs[0]
+        model_dir = dirs[-1] if self.config.eval.evaluate_latest_first else dirs[0]
         config_path = os.path.join(model_dir, rc.next_generation_model_config_filename)
         weight_path = os.path.join(model_dir, rc.next_generation_model_weight_filename)
         model = ReversiModel(self.config)
