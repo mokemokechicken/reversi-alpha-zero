@@ -30,6 +30,7 @@ class Frame(wx.Frame):
     def __init__(self, model: PlayWithHuman, gui_config: GuiConfig):
         self.model = model
         self.gui_config = gui_config
+        self.is_flip_vertical = False
         wx.Frame.__init__(self, None, -1, self.gui_config.window_title, size=self.gui_config.window_size)
         # panel
         self.panel = wx.Panel(self)
@@ -42,12 +43,15 @@ class Frame(wx.Frame):
         menu.Append(1, u"New Game(Black)")
         menu.Append(2, u"New Game(White)")
         menu.AppendSeparator()
+        menu.Append(5, u"Flip Vertical")
+        menu.AppendSeparator()
         menu.Append(9, u"quit")
         menu_bar = wx.MenuBar()
         menu_bar.Append(menu, u"menu")
         self.SetMenuBar(menu_bar)
         self.Bind(wx.EVT_MENU, self.handle_new_game, id=1)
         self.Bind(wx.EVT_MENU, self.handle_new_game, id=2)
+        self.Bind(wx.EVT_MENU, self.handle_flip_vertical, id=5)
         self.Bind(wx.EVT_MENU, self.handle_quit, id=9)
 
         # status bar
@@ -71,6 +75,10 @@ class Frame(wx.Frame):
     def handle_new_game(self, event: CommandEvent):
         self.new_game(human_is_black=event.GetId() == 1)
 
+    def handle_flip_vertical(self, event):
+        self.is_flip_vertical = not self.is_flip_vertical
+        self.panel.Refresh()
+
     def new_game(self, human_is_black):
         self.model.start_game(human_is_black=human_is_black)
         self.model.play_next_turn()
@@ -90,6 +98,9 @@ class Frame(wx.Frame):
         w, h = self.panel.GetSize()
         x = int(event_x / (w / 8))
         y = int(event_y / (h / 8))
+
+        if self.is_flip_vertical:
+            y = 7-y
 
         if not self.model.available(x, y):
             return
@@ -136,18 +147,19 @@ class Frame(wx.Frame):
         # stones
         brushes = {Player.white: wx.Brush("white"), Player.black: wx.Brush("black")}
         for y in range(8):
+            vy = 7-y if self.is_flip_vertical else y
             for x in range(8):
                 c = self.model.stone(x, y)
                 if c is not None:
                     dc.SetBrush(brushes[c])
-                    dc.DrawEllipse(x * px, y * py, px, py)
+                    dc.DrawEllipse(x * px, vy * py, px, py)
                 if self.model.last_history:
                     q_value = self.model.last_history.values[y*8+x]
                     n_value = self.model.last_history.visit[y*8+x]
                     dc.SetTextForeground(wx.Colour("blue"))
                     if n_value:
-                        dc.DrawText(f"{int(n_value):d}", x*px+2, y*py+2)
+                        dc.DrawText(f"{int(n_value):d}", x*px+2, vy*py+2)
                     if q_value:
                         if q_value < 0:
                             dc.SetTextForeground(wx.Colour("red"))
-                        dc.DrawText(f"{int(q_value*100):d}", x*px+2, (y+1)*py-16)
+                        dc.DrawText(f"{int(q_value*100):d}", x*px+2, (vy+1)*py-16)
