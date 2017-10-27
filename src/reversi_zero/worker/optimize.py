@@ -41,9 +41,9 @@ class OptimizeWorker:
         self.compile_model()
         last_save_step = total_steps = self.config.trainer.start_total_steps
         min_data_size_to_learn = 100000
+        self.load_play_data()
 
         while True:
-            self.load_play_data()
             if self.dataset_size < min_data_size_to_learn:
                 logger.info(f"dataset_size={self.dataset_size} is less than {min_data_size_to_learn}")
                 sleep(60)
@@ -54,6 +54,7 @@ class OptimizeWorker:
             if last_save_step + self.config.trainer.save_model_steps < total_steps:
                 self.save_current_model()
                 last_save_step = total_steps
+                self.load_play_data()
 
     def train_epoch(self, epochs):
         tc = self.config.trainer
