@@ -59,7 +59,7 @@ class ReversiPlayer:
         key = self.counter_key(env)
 
         for tl in range(self.play_config.thinking_loop):
-            if tl > 0:
+            if tl > 0 and self.play_config.logging_thinking:
                 logger.debug(f"continue thinking: policy move=({action % 8}, {action // 8}), "
                              f"value move=({action_by_value % 8}, {action_by_value // 8})")
             self.search_moves(own, enemy)
