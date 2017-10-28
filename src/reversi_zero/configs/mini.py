@@ -17,6 +17,7 @@ class PlayDataConfig:
 class PlayConfig:
     def __init__(self):
         self.simulation_num_per_move = 10
+        self.thinking_loop = 1
         self.c_puct = 1
         self.noise_eps = 0.25
         self.dirichlet_alpha = 0.03

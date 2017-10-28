@@ -55,14 +55,22 @@ class ReversiPlayer:
         :param enemy:  BitBoard
         :return: action: move pos=0 ~ 63 (0=top left, 7 top right, 63 bottom right)
         """
-        self.search_moves(own, enemy)
-        policy = self.calc_policy(own, enemy)
-        self.moves.append([(own, enemy), list(policy)])
-        action = int(np.random.choice(range(64), p=policy))
-
-        # this is for play_gui, not necessary when training.
         env = ReversiEnv().update(own, enemy, Player.black)
         key = self.counter_key(env)
+
+        for tl in range(self.play_config.thinking_loop):
+            if tl > 0:
+                logger.debug(f"continue thinking: policy move=({action % 8}, {action // 8}), "
+                             f"value move=({action_by_value % 8}, {action_by_value // 8})")
+            self.search_moves(own, enemy)
+            policy = self.calc_policy(own, enemy)
+            self.moves.append([(own, enemy), list(policy)])
+            action = int(np.random.choice(range(64), p=policy))
+            action_by_value = int(np.argmax(self.var_q[key] - (self.var_q[key] == 0)*100))
+            if action == action_by_value:
+                break
+
+        # this is for play_gui, not necessary when training.
         self.thinking_history[(own, enemy)] = HistoryItem(action, policy, list(self.var_q[key]), list(self.var_n[key]))
 
         return action
