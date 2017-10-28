@@ -67,7 +67,7 @@ class ReversiPlayer:
             self.moves.append([(own, enemy), list(policy)])
             action = int(np.random.choice(range(64), p=policy))
             action_by_value = int(np.argmax(self.var_q[key] - (self.var_q[key] == 0)*100))
-            if action == action_by_value:
+            if action == action_by_value or env.turn < self.play_config.change_tau_turn:
                 break
 
         # this is for play_gui, not necessary when training.
