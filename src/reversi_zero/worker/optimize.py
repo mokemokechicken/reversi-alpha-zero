@@ -47,6 +47,7 @@ class OptimizeWorker:
             if self.dataset_size < min_data_size_to_learn:
                 logger.info(f"dataset_size={self.dataset_size} is less than {min_data_size_to_learn}")
                 sleep(60)
+                self.load_play_data()
                 continue
             self.update_learning_rate(total_steps)
             steps = self.train_epoch(self.config.trainer.epoch_to_checkpoint)
