@@ -169,3 +169,51 @@ Training Speed
 * 1 game in Self-Play: about 47 sec.
 * 1 game in Evaluation: about 50 sec.
 * 1 step(mini-batch, batch size=512) in Training: about 2.3 sec.
+
+Model Performance
+-------
+
+The following table is records of the best models.
+For model performance evaluation,
+I sometimes play with iOS app of https://itunes.apple.com/ca/app/id574915961 .
+
+|best model generation|winning percentage to best model|Time Spent(hours)|note|
+|-----|-----|-----|-----|
+|1|-|-|　|
+|2|94.1%|-|　|
+|3|63.4%|13|　|
+|4|62.0%|3|　|
+|5|56.7%|8|　|
+|6|67.3%|7|　|
+|7|59.0%|3|　|
+|8|59.7%|6|　|
+|9|59.4%|3|　|
+|10|55.7%|5|may be win the app Lv7|
+|11|57.9%|9|　|
+|12|55.6%|5|　|
+|13|56.5%|7|　|
+|14|58.4%|20|　|
+|15|62.4%|3|　|
+|16|56.0%|11|　|
+|17|64.9%|17|　|
+|18|55.2%|19|　|
+|19|57.2%|33|　|
+|20|55.7%|12|　|
+|21|59.7%|20|　|
+|22|57.8%|19|　|
+|23|55.8%|15|　|
+|24|64.2%|12|　|
+|25|55.4%|21|　|
+|26|56.7%|6|　|
+|27|57.5%|11|　|
+|28|58.5%|15|　|
+|29|55.3%|5|　|
+|30|55.0%|8|　|
+|31|56.9%|5|　|
+|32|56.1%|9|　|
+|33|55.7%|22|　|
+|34|56.1%|3|　|
+|35|59.0%|3|　|
+|36|59.4%|3|　|
+|37|56.2%|9|　|
+|38|55.4%|52|Won the app LV9,10|
