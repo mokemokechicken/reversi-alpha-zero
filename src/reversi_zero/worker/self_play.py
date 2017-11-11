@@ -44,9 +44,10 @@ class SelfPlayWorker:
 
         while True:
             start_time = time()
-            self.start_game(idx)
+            env = self.start_game(idx)
             end_time = time()
-            logger.debug(f"play game {idx} time={end_time - start_time} sec")
+            logger.debug(f"play game {idx} time={end_time - start_time} sec, "
+                         f"turn={env.turn}:{env.board.number_of_black_and_white}")
             if (idx % self.config.play_data.nb_game_in_file) == 0:
                 reload_best_model_weight_if_changed(self.model)
             idx += 1
@@ -66,6 +67,7 @@ class SelfPlayWorker:
         self.finish_game()
         self.save_play_data(write=idx % self.config.play_data.nb_game_in_file == 0)
         self.remove_play_data()
+        return self.env
 
     def save_play_data(self, write=True):
         data = self.black.moves + self.white.moves
