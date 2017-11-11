@@ -42,10 +42,14 @@ class ReversiEnv:
     def step(self, action):
         """
 
-        :param int action: move pos=0 ~ 63 (0=top left, 7 top right, 63 bottom right)
+        :param int|None action: move pos=0 ~ 63 (0=top left, 7 top right, 63 bottom right), None is resign
         :return:
         """
-        assert 0 <= action <= 63, f"Illegal action={action}"
+        assert action is None or 0 <= action <= 63, f"Illegal action={action}"
+
+        if action is None:
+            self._resigned()
+            return self.board, {}
 
         own, enemy = self.get_own_and_enemy()
 
@@ -85,8 +89,19 @@ class ReversiEnv:
 
     def illegal_move_to_lose(self, action):
         logger.warning(f"Illegal action={action}, No Flipped!")
-        self.winner = another_player(self.next_player)
+        self._win_another_player()
         self._game_over()
+
+    def _resigned(self):
+        self._win_another_player()
+        self._game_over()
+
+    def _win_another_player(self):
+        win_player = another_player(self.next_player)  # type: Player
+        if win_player == Player.black:
+            self.winner = Winner.black
+        else:
+            self.winner = Winner.white
 
     def get_own_and_enemy(self):
         if self.next_player == Player.black:

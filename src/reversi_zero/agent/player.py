@@ -69,11 +69,15 @@ class ReversiPlayer:
             if action == action_by_value or env.turn < self.play_config.change_tau_turn:
                 break
 
-        self.moves.append([(own, enemy), list(policy)])
         # this is for play_gui, not necessary when training.
         self.thinking_history[(own, enemy)] = HistoryItem(action, policy, list(self.var_q[key]), list(self.var_n[key]))
 
-        return action
+        if self.play_config.resign_threshold is not None and \
+                        np.max(self.var_q[key] - (self.var_n[key] == 0)*10) <= self.play_config.resign_threshold:
+            return None  # means resign
+        else:
+            self.moves.append([(own, enemy), list(policy)])
+            return action
 
     def ask_thought_about(self, own, enemy) -> HistoryItem:
         return self.thinking_history.get((own, enemy))

@@ -29,6 +29,7 @@ class PlayConfig:
         self.parallel_search_num = 4
         self.prediction_worker_sleep_sec  = 0.00001
         self.wait_for_expanding_sleep_sec = 0.000001
+        self.resign_threshold = -0.8
 
 
 class TrainerConfig:
