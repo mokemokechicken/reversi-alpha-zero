@@ -217,3 +217,6 @@ I sometimes play with iOS app of https://itunes.apple.com/ca/app/id574915961 .
 |36|59.4%|3|　|
 |37|56.2%|9|　|
 |38|55.4%|52|Won the app LV9,10|
+|39|57.2%|29|　|
+|40|55.1%|12|Won the app LV11|
+|41|55.7%|14|Won the app LV12, 13, 14|
