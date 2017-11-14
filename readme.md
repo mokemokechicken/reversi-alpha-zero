@@ -219,5 +219,5 @@ I sometimes play with iOS app of https://itunes.apple.com/ca/app/id574915961 .
 |38|2017/11/10|55.4%|52|Won the app LV9, LV10|
 |39|2017/11/12|57.2%|29|　|
 |40|2017/11/12|55.1%|12|Won the app LV11|
-|41|2017/11/13|55.7%|14|Won the app LV12, 13, 14|
+|41|2017/11/13|55.7%|14|Won the app LV12, 13, 14, 15. I can't win anymore.|
 
