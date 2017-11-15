@@ -81,8 +81,10 @@ class OptimizeWorker:
             lr = 1e-2
         elif total_steps < 500000:
             lr = 1e-3
-        else:
+        elif total_steps < 900000:
             lr = 1e-4
+        else:
+            lr = 2.5e-5  # means (1e-4 / 4): the paper batch size=2048, ours is 512.
         K.set_value(self.optimizer.lr, lr)
         logger.debug(f"total step={total_steps}, set learning rate to {lr}")
 
