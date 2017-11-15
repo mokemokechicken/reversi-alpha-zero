@@ -31,6 +31,7 @@ class Frame(wx.Frame):
         self.model = model
         self.gui_config = gui_config
         self.is_flip_vertical = False
+        self.show_player_evaluation = True
         wx.Frame.__init__(self, None, -1, self.gui_config.window_title, size=self.gui_config.window_size)
         # panel
         self.panel = wx.Panel(self)
@@ -44,6 +45,7 @@ class Frame(wx.Frame):
         menu.Append(2, u"New Game(White)")
         menu.AppendSeparator()
         menu.Append(5, u"Flip Vertical")
+        menu.Append(6, u"Show/Hide Player evaluation")
         menu.AppendSeparator()
         menu.Append(9, u"quit")
         menu_bar = wx.MenuBar()
@@ -52,6 +54,7 @@ class Frame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.handle_new_game, id=1)
         self.Bind(wx.EVT_MENU, self.handle_new_game, id=2)
         self.Bind(wx.EVT_MENU, self.handle_flip_vertical, id=5)
+        self.Bind(wx.EVT_MENU, self.handle_show_hide_player_evaluation, id=6)
         self.Bind(wx.EVT_MENU, self.handle_quit, id=9)
 
         # status bar
@@ -77,6 +80,10 @@ class Frame(wx.Frame):
 
     def handle_flip_vertical(self, event):
         self.is_flip_vertical = not self.is_flip_vertical
+        self.panel.Refresh()
+
+    def handle_show_hide_player_evaluation(self, event):
+        self.show_player_evaluation = not self.show_player_evaluation
         self.panel.Refresh()
 
     def new_game(self, human_is_black):
@@ -156,6 +163,9 @@ class Frame(wx.Frame):
                 if self.model.last_history:
                     q_value = self.model.last_history.values[y*8+x]
                     n_value = self.model.last_history.visit[y*8+x]
+                    enemy_q_value = - self.model.last_history.enemy_values[y*8+x]
+                    enemy_n_value = self.model.last_history.enemy_visit[y*8+x]
+
                     dc.SetTextForeground(wx.Colour("blue"))
                     if n_value:
                         dc.DrawText(f"{int(n_value):d}", x*px+2, vy*py+2)
@@ -163,3 +173,12 @@ class Frame(wx.Frame):
                         if q_value < 0:
                             dc.SetTextForeground(wx.Colour("red"))
                         dc.DrawText(f"{int(q_value*100):d}", x*px+2, (vy+1)*py-16)
+
+                    if self.show_player_evaluation:
+                        dc.SetTextForeground(wx.Colour("purple"))
+                        if enemy_n_value:
+                            dc.DrawText(f"{int(enemy_n_value):2d}", (x+1)*px-20, vy*py+2)
+                        if enemy_q_value:
+                            if enemy_q_value < 0:
+                                dc.SetTextForeground(wx.Colour("orange"))
+                            dc.DrawText(f"{int(enemy_q_value*100):2d}", (x+1)*px-24, (vy+1)*py-16)
