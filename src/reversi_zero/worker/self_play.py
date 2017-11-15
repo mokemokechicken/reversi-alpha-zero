@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from logging import getLogger
+from random import random
 from time import time
 
 from reversi_zero.agent.player import ReversiPlayer
@@ -34,6 +35,8 @@ class SelfPlayWorker:
         self.black = None  # type: ReversiPlayer
         self.white = None  # type: ReversiPlayer
         self.buffer = []
+        self.false_positive_count_of_resign = 0
+        self.resign_test_game_count = 0
 
     def start(self):
         if self.model is None:
@@ -49,13 +52,18 @@ class SelfPlayWorker:
             logger.debug(f"play game {idx} time={end_time - start_time} sec, "
                          f"turn={env.turn}:{env.board.number_of_black_and_white}")
             if (idx % self.config.play_data.nb_game_in_file) == 0:
-                reload_best_model_weight_if_changed(self.model)
+                if reload_best_model_weight_if_changed(self.model):
+                    self.reset_false_positive_count()
+
             idx += 1
 
     def start_game(self, idx):
         self.env.reset()
-        self.black = ReversiPlayer(self.config, self.model)
-        self.white = ReversiPlayer(self.config, self.model)
+        enable_resign = self.config.play.disable_resignation_rate <= random()
+        self.black = ReversiPlayer(self.config, self.model, enable_resign=enable_resign)
+        self.white = ReversiPlayer(self.config, self.model, enable_resign=enable_resign)
+        if not enable_resign:
+            logger.debug("Resignation is disabled in the next game.")
         observation = self.env.observation  # type: Board
         while not self.env.done:
             # logger.debug(f"turn={self.env.turn}")
@@ -64,7 +72,7 @@ class SelfPlayWorker:
             else:
                 action = self.white.action(observation.white, observation.black)
             observation, info = self.env.step(action)
-        self.finish_game()
+        self.finish_game(resign_enabled=enable_resign)
         self.save_play_data(write=idx % self.config.play_data.nb_game_in_file == 0)
         self.remove_play_data()
         return self.env
@@ -90,20 +98,26 @@ class SelfPlayWorker:
         for i in range(len(files) - self.config.play_data.max_file_num):
             os.remove(files[i])
 
-    def finish_game(self):
+    def finish_game(self, resign_enabled=True):
         if self.env.winner == Winner.black:
             black_win = 1
+            false_positive_of_resign = self.black.resigned
         elif self.env.winner == Winner.white:
             black_win = -1
+            false_positive_of_resign = self.white.resigned
         else:
             black_win = 0
+            false_positive_of_resign = self.black.resigned or self.white.resigned
 
         self.black.finish_game(black_win)
         self.white.finish_game(-black_win)
 
-        # black_num, white_num = self.env.board.number_of_black_and_white
-        # self.env.message(f"black={black_num} white={white_num} winner={self.env.winner}")
-        # self.env.render()
+        if not resign_enabled:
+            self.resign_test_game_count += 1
+            if false_positive_of_resign:
+                self.false_positive_count_of_resign += 1
+                logger.debug("false positive of resignation happened")
+            self.check_and_update_resignation_threshold()
 
     def load_model(self):
         from reversi_zero.agent.model import ReversiModel
@@ -113,4 +127,24 @@ class SelfPlayWorker:
             save_as_best_model(model)
         return model
 
+    def reset_false_positive_count(self):
+        self.false_positive_count_of_resign = 0
+        self.resign_test_game_count = 0
 
+    @property
+    def false_positive_rate(self):
+        if self.resign_test_game_count == 0:
+            return 0
+        return self.false_positive_count_of_resign / self.resign_test_game_count
+
+    def check_and_update_resignation_threshold(self):
+        if self.resign_test_game_count < 100 or self.config.play.resign_threshold is None:
+            return
+
+        old_threshold = self.config.play.resign_threshold
+        if self.false_positive_rate >= self.config.play.false_positive_threshold:
+            self.config.play.resign_threshold -= self.config.play.resign_threshold_delta
+        else:
+            self.config.play.resign_threshold += self.config.play.resign_threshold_delta
+        logger.debug(f"update resign_threshold: {old_threshold} -> {self.config.play.resign_threshold}")
+        self.reset_false_positive_count()

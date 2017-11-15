@@ -8,6 +8,7 @@ class EvaluateConfig:
         self.play_config.c_puct = 1
         self.play_config.change_tau_turn = 0
         self.play_config.noise_eps = 0
+        self.play_config.disable_resignation_rate = 0
         self.evaluate_latest_first = True
 
 
@@ -32,6 +33,9 @@ class PlayConfig:
         self.prediction_worker_sleep_sec  = 0.0001
         self.wait_for_expanding_sleep_sec = 0.00001
         self.resign_threshold = -0.8
+        self.disable_resignation_rate = 0.1
+        self.false_positive_threshold = 0.05
+        self.resign_threshold_delta = 0.01
 
 
 class TrainerConfig:
