@@ -14,7 +14,7 @@ from reversi_zero.lib.bitboard import find_correct_moves, bit_to_array, flip_ver
 
 CounterKey = namedtuple("CounterKey", "black white next_player")
 QueueItem = namedtuple("QueueItem", "state future")
-HistoryItem = namedtuple("HistoryItem", "action policy values visit")
+HistoryItem = namedtuple("HistoryItem", "action policy values visit enemy_values enemy_visit")
 
 logger = getLogger(__name__)
 
@@ -68,11 +68,13 @@ class ReversiPlayer:
             policy = self.calc_policy(own, enemy)
             action = int(np.random.choice(range(64), p=policy))
             action_by_value = int(np.argmax(self.var_q[key] + (self.var_n[key] > 0)*100))
-            if action == action_by_value or env.turn < self.play_config.change_tau_turn:
+            if action == action_by_value or env.turn < self.play_config.change_tau_turn or env.turn <= 1:
                 break
 
         # this is for play_gui, not necessary when training.
-        self.thinking_history[(own, enemy)] = HistoryItem(action, policy, list(self.var_q[key]), list(self.var_n[key]))
+        next_key = self.get_next_key(own, enemy, action)
+        self.thinking_history[(own, enemy)] = HistoryItem(action, policy, list(self.var_q[key]), list(self.var_n[key]),
+                                                          list(self.var_q[next_key]), list(self.var_n[next_key]))
 
         if self.play_config.resign_threshold is not None and \
                         np.max(self.var_q[key] - (self.var_n[key] == 0)*10) <= self.play_config.resign_threshold:
@@ -82,6 +84,11 @@ class ReversiPlayer:
 
         self.moves.append([(own, enemy), list(policy)])
         return action
+
+    def get_next_key(self, own, enemy, action):
+        env = ReversiEnv().update(own, enemy, Player.black)
+        env.step(action)
+        return self.counter_key(env)
 
     def ask_thought_about(self, own, enemy) -> HistoryItem:
         return self.thinking_history.get((own, enemy))
