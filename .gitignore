@@ -20,3 +20,5 @@ video/*
 *.h5
 logs/
 *.sh
+!/download_best_model.sh
+!/doc/img/play_gui.png
