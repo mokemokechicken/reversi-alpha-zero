@@ -220,5 +220,8 @@ sometimes I am competing with iOS app(https://itunes.apple.com/ca/app/id57491596
 |39|2017/11/12|57.2%|29|　|
 |40|2017/11/12|55.1%|12|Won the app LV11|
 |41|2017/11/13|55.7%|14|Won the app LV12, 13, 14, 15, 16, 17. I can't win anymore.|
-|42|2017/11/15|-|-|Won the app LV18, 19|
+|42|2017/11/15|57.8%|18|Won the app LV18, 19|
+|43|2017/11/15|55.8%|16|　|
+|44|2017/11/16|57.5%|8|　|
+|45|2017/11/16|56.2%|3|Won the app LV20|
 
