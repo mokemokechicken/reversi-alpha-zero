@@ -20,7 +20,7 @@ logger = getLogger(__name__)
 
 
 class ReversiPlayer:
-    def __init__(self, config: Config, model, play_config=None):
+    def __init__(self, config: Config, model, play_config=None, enable_resign=True):
         """
 
         :param config:
@@ -29,6 +29,7 @@ class ReversiPlayer:
         self.config = config
         self.model = model
         self.play_config = play_config or self.config.play
+        self.enable_resign = enable_resign
         self.api = ReversiModelAPI(self.config, self.model)
 
         # key=(own, enemy, action)
@@ -47,6 +48,7 @@ class ReversiPlayer:
         self.running_simulation_num = 0
 
         self.thinking_history = {}  # for fun
+        self.resigned = False
 
     def action(self, own, enemy):
         """
@@ -74,10 +76,12 @@ class ReversiPlayer:
 
         if self.play_config.resign_threshold is not None and \
                         np.max(self.var_q[key] - (self.var_n[key] == 0)*10) <= self.play_config.resign_threshold:
-            return None  # means resign
-        else:
-            self.moves.append([(own, enemy), list(policy)])
-            return action
+            self.resigned = True
+            if self.enable_resign:
+                return None  # means resign
+
+        self.moves.append([(own, enemy), list(policy)])
+        return action
 
     def ask_thought_about(self, own, enemy) -> HistoryItem:
         return self.thinking_history.get((own, enemy))
