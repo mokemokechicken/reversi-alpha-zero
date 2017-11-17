@@ -224,4 +224,5 @@ sometimes I am competing with iOS app(https://itunes.apple.com/ca/app/id57491596
 |43|2017/11/15|55.8%|16|　|
 |44|2017/11/16|57.5%|8|　|
 |45|2017/11/16|56.2%|3|Won the app LV20|
+|46|2017/11/18|55.6%|49|　|
 
