@@ -39,7 +39,7 @@ class OptimizeWorker:
 
     def training(self):
         self.compile_model()
-        last_save_step = total_steps = self.config.trainer.start_total_steps
+        last_load_data_step = last_save_step = total_steps = self.config.trainer.start_total_steps
         min_data_size_to_learn = 100000
         self.load_play_data()
 
@@ -55,7 +55,10 @@ class OptimizeWorker:
             if last_save_step + self.config.trainer.save_model_steps < total_steps:
                 self.save_current_model()
                 last_save_step = total_steps
+
+            if last_load_data_step + self.config.trainer.load_data_steps < total_steps:
                 self.load_play_data()
+                last_load_data_step = total_steps
 
     def train_epoch(self, epochs):
         tc = self.config.trainer
