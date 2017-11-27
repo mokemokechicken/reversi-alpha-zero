@@ -22,7 +22,7 @@ class PlayConfig:
         self.simulation_num_per_move = 500
         self.thinking_loop = 2
         self.logging_thinking = False
-        self.c_puct = 3
+        self.c_puct = 1.5
         self.noise_eps = 0.25
         self.dirichlet_alpha = 0.03
         self.change_tau_turn = 10

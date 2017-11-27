@@ -229,4 +229,6 @@ sometimes I am competing with iOS app(https://itunes.apple.com/ca/app/id57491596
 |48|2017/11/19|59.4%|9|　|
 |49|2017/11/20|55.9%|6|　|
 |50|2017/11/22|56.0%|44|　|
+|51|2017/11/26|55.8%|112|11/25 morning, changed c_puct from 3 to 1.5.|
+|52|2017/11/26|59.7%|6|　|
 
