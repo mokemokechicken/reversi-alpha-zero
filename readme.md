@@ -177,6 +177,9 @@ The following table is records of the best models.
 For model performance evaluation,
 sometimes I am competing with iOS app(https://itunes.apple.com/ca/app/id574915961) and the best model.
 
+It takes about 2~3 hours to evaluate one model in my environment.
+Therefore, if you divide the time taken by 3, you can see the approximate number of evaluation times.
+
 |best model generation|date|winning percentage to best model|Time Spent(hours)|note|
 |-----|---|-----|-----|-----|
 |1|-|-|-|　|
@@ -232,4 +235,5 @@ sometimes I am competing with iOS app(https://itunes.apple.com/ca/app/id57491596
 |51|2017/11/26|55.8%|112|11/25 morning, changed c_puct from 3 to 1.5.|
 |52|2017/11/26|59.7%|6|　|
 |53|2017/11/28|56.2%|33|Won the app LV21|
+|54|2017/11/29|59.0%|24|　|
 
