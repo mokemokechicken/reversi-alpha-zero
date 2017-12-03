@@ -82,7 +82,8 @@ class ReversiPlayer:
             if self.enable_resign:
                 return None  # means resign
 
-        self.moves.append([(own, enemy), list(policy)])
+        saved_policy = self.calc_policy_by_tau_1(key) if self.config.play_data.save_policy_of_tau_1 else policy
+        self.moves.append([(own, enemy), list(saved_policy)])
         return action
 
     def get_next_key(self, own, enemy, action):
@@ -249,12 +250,15 @@ class ReversiPlayer:
         env = ReversiEnv().update(own, enemy, Player.black)
         key = self.counter_key(env)
         if env.turn < pc.change_tau_turn:
-            return self.var_n[key] / np.sum(self.var_n[key])  # tau = 1
+            return self.calc_policy_by_tau_1(key)
         else:
             action = np.argmax(self.var_n[key])  # tau = 0
             ret = np.zeros(64)
             ret[action] = 1
             return ret
+
+    def calc_policy_by_tau_1(self, key):
+        return self.var_n[key] / np.sum(self.var_n[key])  # tau = 1
 
     @staticmethod
     def counter_key(env: ReversiEnv):

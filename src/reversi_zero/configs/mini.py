@@ -13,6 +13,7 @@ class PlayDataConfig:
     def __init__(self):
         self.nb_game_in_file = 100
         self.max_file_num = 10
+        self.save_policy_of_tau_1 = True
 
 
 class PlayConfig:
