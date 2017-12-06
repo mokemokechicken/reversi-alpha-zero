@@ -83,8 +83,23 @@ class ReversiPlayer:
                 return None  # means resign
 
         saved_policy = self.calc_policy_by_tau_1(key) if self.config.play_data.save_policy_of_tau_1 else policy
-        self.moves.append([(own, enemy), list(saved_policy)])
+        self.add_data_to_move_buffer_with_8_symmetries(own, enemy, saved_policy)
         return action
+
+    def add_data_to_move_buffer_with_8_symmetries(self, own, enemy, policy):
+        for flip in [False, True]:
+            for rot_right in range(4):
+                own_saved, enemy_saved, policy_saved = own, enemy, policy.reshape((8, 8))
+                if flip:
+                    own_saved = flip_vertical(own_saved)
+                    enemy_saved = flip_vertical(enemy_saved)
+                    policy_saved = np.flipud(policy_saved)
+                if rot_right:
+                    for _ in range(rot_right):
+                        own_saved = rotate90(own_saved)
+                        enemy_saved = rotate90(enemy_saved)
+                    policy_saved = np.rot90(policy_saved, k=-rot_right)
+                self.moves.append([(own_saved, enemy_saved), list(policy_saved.reshape((64, )))])
 
     def get_next_key(self, own, enemy, action):
         env = ReversiEnv().update(own, enemy, Player.black)
