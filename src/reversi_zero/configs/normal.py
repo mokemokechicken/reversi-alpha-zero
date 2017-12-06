@@ -25,7 +25,7 @@ class PlayConfig:
         self.logging_thinking = False
         self.c_puct = 1.5
         self.noise_eps = 0.25
-        self.dirichlet_alpha = 0.03
+        self.dirichlet_alpha = 0.5
         self.change_tau_turn = 10
         self.virtual_loss = 3
         self.prediction_queue_size = 16
