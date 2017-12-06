@@ -83,8 +83,23 @@ class ReversiPlayer:
                 return None  # means resign
 
         saved_policy = self.calc_policy_by_tau_1(key) if self.config.play_data.save_policy_of_tau_1 else policy
-        self.moves.append([(own, enemy), list(saved_policy)])
+        self.add_data_to_move_buffer_with_8_symmetries(own, enemy, saved_policy)
         return action
+
+    def add_data_to_move_buffer_with_8_symmetries(self, own, enemy, policy):
+        for flip in [False, True]:
+            for rot_right in range(4):
+                own_saved, enemy_saved, policy_saved = own, enemy, policy.reshape((8, 8))
+                if flip:
+                    own_saved = flip_vertical(own_saved)
+                    enemy_saved = flip_vertical(enemy_saved)
+                    policy_saved = np.flipud(policy_saved)
+                if rot_right:
+                    for _ in range(rot_right):
+                        own_saved = rotate90(own_saved)
+                        enemy_saved = rotate90(enemy_saved)
+                    policy_saved = np.rot90(policy_saved, k=-rot_right)
+                self.moves.append([(own_saved, enemy_saved), list(policy_saved.reshape((64, )))])
 
     def get_next_key(self, own, enemy, action):
         env = ReversiEnv().update(own, enemy, Player.black)
@@ -275,9 +290,14 @@ class ReversiPlayer:
         xx_ = max(xx_, 1)  # avoid u_=0 if N is all 0
         p_ = self.var_p[key]
 
-        if is_root_node:  # Is it correct?? -> (1-e)p + e*Dir(0.03)
+        if is_root_node:  # Is it correct?? -> (1-e)p + e*Dir(alpha)
             p_ = (1 - self.play_config.noise_eps) * p_ + \
                  self.play_config.noise_eps * np.random.dirichlet([self.play_config.dirichlet_alpha] * 64)
+
+        # re-normalize in legal moves
+        p_ = p_ * bit_to_array(legal_moves, 64)
+        if np.sum(p_) > 0:
+            p_ = p_ / np.sum(p_)
 
         u_ = self.play_config.c_puct * p_ * xx_ / (1 + self.var_n[key])
         if env.next_player == Player.black:
