@@ -236,4 +236,9 @@ Therefore, if you divide the time taken by 3, you can see the approximate number
 |52|2017/11/26|59.7%|6|　|
 |53|2017/11/28|56.2%|33|Won the app LV21|
 |54|2017/11/29|59.0%|24|　|
+|55|2017/12/01|56.6%|58|　|
+|56|2017/12/03|58.1%|49|self-play: always save policy of tau=1|
+|57|2017/12/04|55.1%|24|　|
+|58|2017/12/05|55.9%|35|　|
+|59|2017/12/06|55.4%|6|　|
 
