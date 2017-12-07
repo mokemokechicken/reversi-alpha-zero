@@ -13,8 +13,8 @@ class EvaluateConfig:
 
 class PlayDataConfig:
     def __init__(self):
-        self.nb_game_in_file = 100
-        self.max_file_num = 200  # 5000
+        self.nb_game_in_file = 10
+        self.max_file_num = 2000  # 50000
         self.save_policy_of_tau_1 = True
 
 
@@ -44,7 +44,7 @@ class TrainerConfig:
         self.epoch_to_checkpoint = 1
         self.start_total_steps = 0
         self.save_model_steps = 2000
-        self.load_data_steps = 10000
+        self.load_data_steps = 2000
 
 
 class ModelConfig:
