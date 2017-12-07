@@ -36,7 +36,6 @@ class ReversiPlayer:
         self.var_n = defaultdict(lambda: np.zeros((64,)))
         self.var_w = defaultdict(lambda: np.zeros((64,)))
         self.var_q = defaultdict(lambda: np.zeros((64,)))
-        self.var_u = defaultdict(lambda: np.zeros((64,)))
         self.var_p = defaultdict(lambda: np.zeros((64,)))
         self.expanded = set()
         self.now_expanding = set()
@@ -163,14 +162,16 @@ class ReversiPlayer:
         _, _ = env.step(action_t)
 
         virtual_loss = self.config.play.virtual_loss
+        virtual_loss_for_w = virtual_loss if env.next_player == Player.black else -virtual_loss
         self.var_n[key][action_t] += virtual_loss
-        self.var_w[key][action_t] -= virtual_loss
+        self.var_w[key][action_t] -= virtual_loss_for_w
+        self.var_q[key][action_t] = self.var_w[key][action_t] / self.var_n[key][action_t]
         leaf_v = await self.search_my_move(env)  # next move
 
         # on returning search path
-        # update: N, W, Q, U
+        # update: N, W, Q
         n = self.var_n[key][action_t] = self.var_n[key][action_t] - virtual_loss + 1
-        w = self.var_w[key][action_t] = self.var_w[key][action_t] + virtual_loss + leaf_v
+        w = self.var_w[key][action_t] = self.var_w[key][action_t] + virtual_loss_for_w + leaf_v
         self.var_q[key][action_t] = w / n
         return leaf_v
 
