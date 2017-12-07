@@ -242,4 +242,6 @@ Therefore, if you divide the time taken by 3, you can see the approximate number
 |58|2017/12/05|55.9%|35|　|
 |59|2017/12/06|55.4%|6|　|
 |-|2017/12/06|-|-|implement https://github.com/mokemokechicken/reversi-alpha-zero/issues/13|
+|60|2017/12/07|61.7%|25|　|
+|61|2017/12/07|58.1%|3|　|
 
