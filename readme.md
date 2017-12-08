@@ -246,4 +246,6 @@ Therefore, if you divide the time taken by 3, you can see the approximate number
 |61|2017/12/07|58.1%|3|Won the app LV21,22|
 |62|2017/12/07|57.8%|11|　|
 |-|2017/12/07|-|-|fix bug about virtual loss W|
+|63|2017/12/08|57.5%|9|　|
+|64|2017/12/08|56.0%|9|　|
 
