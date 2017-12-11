@@ -11,7 +11,7 @@ from reversi_zero.env.reversi_env import ReversiEnv, Player
 from reversi_zero.lib import tf_util
 from reversi_zero.lib.data_helper import get_game_data_filenames, write_game_data_to_file
 from reversi_zero.lib.model_helpler import load_best_model_weight, save_as_best_model, \
-    reload_best_model_weight_if_changed
+    reload_best_model_weight_if_changed, reload_newest_next_generation_model_if_changed
 
 logger = getLogger(__name__)
 
@@ -52,8 +52,11 @@ class SelfPlayWorker:
             logger.debug(f"play game {idx} time={end_time - start_time} sec, "
                          f"turn={env.turn}:{env.board.number_of_black_and_white}")
             if (idx % self.config.play_data.nb_game_in_file) == 0:
-                if reload_best_model_weight_if_changed(self.model):
-                    self.reset_false_positive_count()
+                if self.config.play.use_newest_next_generation_model:
+                    reload_newest_next_generation_model_if_changed(self.model)
+                else:
+                    if reload_best_model_weight_if_changed(self.model):
+                        self.reset_false_positive_count()
 
             idx += 1
 
@@ -122,7 +125,14 @@ class SelfPlayWorker:
     def load_model(self):
         from reversi_zero.agent.model import ReversiModel
         model = ReversiModel(self.config)
-        if self.config.opts.new or not load_best_model_weight(model):
+        loaded = False
+        if not self.config.opts.new:
+            if self.config.play.use_newest_next_generation_model:
+                loaded = reload_newest_next_generation_model_if_changed(model) or load_best_model_weight(model)
+            else:
+                loaded = load_best_model_weight(model) or reload_newest_next_generation_model_if_changed(model)
+
+        if not loaded:
             model.build()
             save_as_best_model(model)
         return model

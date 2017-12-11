@@ -34,6 +34,7 @@ class PlayConfig:
         self.disable_resignation_rate = 0.1
         self.false_positive_threshold = 0.05
         self.resign_threshold_delta = 0.01
+        self.use_newest_next_generation_model = True
 
 
 class TrainerConfig:

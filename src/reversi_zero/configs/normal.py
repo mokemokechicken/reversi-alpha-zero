@@ -13,8 +13,9 @@ class EvaluateConfig:
 
 class PlayDataConfig:
     def __init__(self):
-        self.nb_game_in_file = 10
-        self.max_file_num = 2000  # 50000
+        # Max Training Data Size = nb_game_in_file * max_file_num * 8
+        self.nb_game_in_file = 20
+        self.max_file_num = 500
         self.save_policy_of_tau_1 = True
 
 
@@ -36,6 +37,10 @@ class PlayConfig:
         self.disable_resignation_rate = 0.1
         self.false_positive_threshold = 0.05
         self.resign_threshold_delta = 0.01
+
+        # True means evaluating 'AlphaZero' method (disable 'eval' worker).
+        # Please change to False if you want to evaluate 'AlphaGo Zero' method.
+        self.use_newest_next_generation_model = True
 
 
 class TrainerConfig:
