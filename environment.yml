@@ -1,0 +1,12 @@
+name: reversi-a0
+
+dependencies:
+  - python==3.6.3
+  - pip
+  - pip:
+    - jedi==0.11.0
+    - Keras==2.0.8
+    - parso==0.1.0
+    - python-dotenv==0.7.1
+    - tensorflow_tensorboard==0.1.8
+    - wxPython==4.0.0b2

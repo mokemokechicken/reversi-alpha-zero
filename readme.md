@@ -48,6 +48,18 @@ Setup
 pip install -r requirements.txt
 ```
 
+### install libraries with Anaconda
+```bash
+cp requirements.txt conda-requirements.txt
+```
+* Comment out lines for `jedi`, `Keras`, `parso`, `python-dotenv`, `tensorflow-tensorboard`, `wxPython` libraries
+* Replace '-' with '_' for  `ipython-genutils`, `jupyter-*`, `prompt-toolkit` libraries
+```bash
+conda env create -f environment.yml
+source activate reversi-a0
+conda install --yes --file conda-requirements.txt
+```
+
 If you want use GPU,
 
 ```bash
