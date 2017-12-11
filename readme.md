@@ -125,15 +125,6 @@ Play Game
 python src/reversi_zero/run.py play_gui
 ```
 
-<img src="doc/img/play_gui.png">
-
-
-When executed, ordinary reversi board will be displayed and you can play against BestModel.
-After BestModel moves, numbers are displayed on the board.
-
-* Top left numbers(1) mean 'Visit Count (=N(s,a))' of the last search.
-* Bottom left numbers(2) mean 'Q Value (=Q(s,a)) on AI side' of the last state and move. The Q values are multiplied by 100.
-
 ### Note: Mac pyenv environment
 
 `play_gui` uses `wxPython`.
@@ -143,6 +134,22 @@ Try following pyenv install option.
 ```bash
 env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.6.3
 ```
+
+For Anaconda users:
+```bash
+conda install python.app
+pythonw src/reversi_zero/run.py play_gui
+```
+
+<img src="doc/img/play_gui.png">
+
+
+When executed, ordinary reversi board will be displayed and you can play against BestModel.
+After BestModel moves, numbers are displayed on the board.
+
+* Top left numbers(1) mean 'Visit Count (=N(s,a))' of the last search.
+* Bottom left numbers(2) mean 'Q Value (=Q(s,a)) on AI side' of the last state and move. The Q values are multiplied by 100.
+
 
 Tips and Memo
 ====
