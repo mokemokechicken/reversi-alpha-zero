@@ -76,11 +76,12 @@ class PlayWithHumanConfig:
         self.noise_eps = 0
         self.change_tau_turn = 0
         self.resign_threshold = None
+        self.use_newest_next_generation_model = True
 
     def update_play_config(self, pc):
         """
 
-        :param PlayConfig pc:
+        :param reversi_zero.configs.normal.PlayConfig pc:
         :return:
         """
         pc.simulation_num_per_move = self.simulation_num_per_move
@@ -91,3 +92,4 @@ class PlayWithHumanConfig:
         pc.change_tau_turn = self.change_tau_turn
         pc.parallel_search_num = self.parallel_search_num
         pc.resign_threshold = self.resign_threshold
+        pc.use_newest_next_generation_model = self.use_newest_next_generation_model

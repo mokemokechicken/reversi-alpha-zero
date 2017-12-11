@@ -6,7 +6,7 @@ from reversi_zero.agent.player import ReversiPlayer
 from reversi_zero.config import Config
 from reversi_zero.env.reversi_env import Player, ReversiEnv
 from reversi_zero.lib.bitboard import find_correct_moves
-from reversi_zero.lib.model_helpler import load_best_model_weight
+from reversi_zero.lib.model_helpler import load_best_model_weight, reload_newest_next_generation_model_if_changed
 
 logger = getLogger(__name__)
 
@@ -91,8 +91,12 @@ class PlayWithHuman:
     def _load_model(self):
         from reversi_zero.agent.model import ReversiModel
         model = ReversiModel(self.config)
-        if not load_best_model_weight(model):
-            raise RuntimeError("best model not found!")
+        if self.config.play.use_newest_next_generation_model:
+            loaded = reload_newest_next_generation_model_if_changed(model) or load_best_model_weight(model)
+        else:
+            loaded = load_best_model_weight(model) or reload_newest_next_generation_model_if_changed(model)
+        if not loaded:
+            raise RuntimeError("No models found!")
         return model
 
     def move_by_ai(self):
