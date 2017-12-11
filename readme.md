@@ -21,6 +21,7 @@ This AlphaGo Zero implementation consists of three worker `self`, `opt` and `eva
 * `self` is Self-Play to generate training data by self-play using BestModel.
 * `opt` is Trainer to train model, and generate next-generation models.
 * `eval` is Evaluator to evaluate whether the next-generation model is better than BestModel. If better, replace BestModel.
+  * If `config.play.use_newest_next_generation_model = True`, this worker is useless. (It is AlphaZero method)
 
 ### Evaluation
 
