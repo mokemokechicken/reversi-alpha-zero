@@ -269,3 +269,7 @@ Therefore, if you divide the time taken by 3, you can see the approximate number
 |63|2017/12/08|57.5%|9|　|
 |64|2017/12/08|56.0%|9|　|
 
+Challenge 2 (since 2017/12/14)
+------------
+
+

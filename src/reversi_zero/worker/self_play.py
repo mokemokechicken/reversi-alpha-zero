@@ -17,7 +17,7 @@ logger = getLogger(__name__)
 
 
 def start(config: Config):
-    tf_util.set_session_config(per_process_gpu_memory_fraction=0.2)
+    tf_util.set_session_config(per_process_gpu_memory_fraction=0.3)
     return SelfPlayWorker(config, env=ReversiEnv()).start()
 
 
@@ -51,7 +51,7 @@ class SelfPlayWorker:
             end_time = time()
             logger.debug(f"play game {idx} time={end_time - start_time} sec, "
                          f"turn={env.turn}:{env.board.number_of_black_and_white}")
-            if (idx % self.config.play_data.nb_game_in_file) == 0:
+            if True or (idx % self.config.play_data.nb_game_in_file) == 0:
                 if self.config.play.use_newest_next_generation_model:
                     reload_newest_next_generation_model_if_changed(self.model)
                 else:
