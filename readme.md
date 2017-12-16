@@ -272,4 +272,6 @@ Therefore, if you divide the time taken by 3, you can see the approximate number
 Challenge 2 (since 2017/12/14)
 ------------
 
-
+|date|note|
+|:---:|---|
+|2017/12/15|Won the app LV1|
