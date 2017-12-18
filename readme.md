@@ -185,8 +185,8 @@ Training Speed
 
 * CPU: 8 core i7-7700K CPU @ 4.20GHz
 * GPU: GeForce GTX 1080
-* 1 game in Self-Play: about 47 sec.
-* 1 game in Evaluation: about 50 sec.
+* 1 game in Self-Play: about 100~200 sec (simulation_num_per_move = 500, thinking_loop = 2).
+* 1 game in Evaluation: about 50 sec (simulation_num_per_move = 100, thinking_loop = 5).
 * 1 step(mini-batch, batch size=512) in Training: about 2.3 sec.
 
 Model Performance
