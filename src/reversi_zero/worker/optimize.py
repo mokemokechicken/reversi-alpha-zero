@@ -5,6 +5,7 @@ from time import sleep
 
 import keras.backend as K
 import numpy as np
+from keras.callbacks import LambdaCallback, Callback
 from keras.optimizers import SGD
 
 from reversi_zero.agent.model import ReversiModel, objective_function_for_policy, \
@@ -39,31 +40,25 @@ class OptimizeWorker:
 
     def training(self):
         self.compile_model()
-        last_load_data_step = last_save_step = total_steps = self.config.trainer.start_total_steps
-        self.load_play_data()
+        total_steps = self.config.trainer.start_total_steps
+        save_model_callback = PerStepCallback(self.config.trainer.save_model_steps, self.save_current_model)
+        callbacks = [save_model_callback]
 
         while True:
+            self.load_play_data()
             if self.dataset_size < self.config.trainer.min_data_size_to_learn:
                 logger.info(f"dataset_size={self.dataset_size} is less than {self.config.trainer.min_data_size_to_learn}")
                 sleep(60)
-                self.load_play_data()
                 continue
             self.update_learning_rate(total_steps)
-            steps = self.train_epoch(self.config.trainer.epoch_to_checkpoint)
-            total_steps += steps
-            if last_save_step + self.config.trainer.save_model_steps < total_steps:
-                self.save_current_model()
-                last_save_step = total_steps
+            total_steps += self.train_epoch(self.config.trainer.epoch_to_checkpoint, callbacks)
 
-            if last_load_data_step + self.config.trainer.load_data_steps < total_steps:
-                self.load_play_data()
-                last_load_data_step = total_steps
-
-    def train_epoch(self, epochs):
+    def train_epoch(self, epochs, callbacks):
         tc = self.config.trainer
         state_ary, policy_ary, z_ary = self.dataset
         self.model.model.fit(state_ary, [policy_ary, z_ary],
                              batch_size=tc.batch_size,
+                             callbacks=callbacks,
                              epochs=epochs)
         steps = (state_ary.shape[0] // tc.batch_size) * epochs
         return steps
@@ -183,3 +178,16 @@ class OptimizeWorker:
             z_list.append(z)
 
         return np.array(state_list), np.array(policy_list), np.array(z_list)
+
+
+class PerStepCallback(Callback):
+    def __init__(self, per_step, callback):
+        super().__init__()
+        self.per_step = per_step
+        self.step = 0
+        self.callback = callback
+
+    def on_batch_end(self, batch, logs=None):
+        self.step += 1
+        if self.step % self.per_step == 0:
+            self.callback()

@@ -49,8 +49,7 @@ class TrainerConfig:
         self.min_data_size_to_learn = 100000
         self.epoch_to_checkpoint = 1
         self.start_total_steps = 0
-        self.save_model_steps = 1
-        self.load_data_steps = 1
+        self.save_model_steps = 200
 
 
 class ModelConfig:
