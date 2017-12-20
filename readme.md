@@ -277,3 +277,4 @@ Challenge 2 (since 2017/12/14)
 |2017/12/15|Won the app LV1|
 |2017/12/17|Won the app LV3,5,7,9|
 |2017/12/18|Won the app LV11,13|
+|2017/12/20|Won the app LV14|
