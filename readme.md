@@ -76,10 +76,18 @@ KERAS_BACKEND=tensorflow
 
 ### Download Trained BestModel(If needed)
 
-Download trained BestModel for example.
+Download trained BestModel(trained by bellow Challenge 1) for example.
 
 ```bash
 sh ./download_best_model.sh
+```
+
+### Download Trained the Newest Model(If needed)
+
+Download trained the newest model(trained by Challenge 2) as BestModel.
+
+```bash
+sh ./download_newest_model_as_best_model.sh
 ```
 
 Configuration

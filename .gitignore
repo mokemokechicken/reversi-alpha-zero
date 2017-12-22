@@ -23,4 +23,5 @@ video/*
 logs/
 *.sh
 !/download_best_model.sh
+!/download_newest_model_as_best_model.sh
 !/doc/img/play_gui.png
