@@ -113,8 +113,8 @@ It is able to change these methods by configuration.
 ### policy distribution of self-play
 
 In DeepMind's paper,
-it seems that policy(π) data saved by self-play are distribution in proportion to pow(N, tau).
-After the middle of the game, the tau becomes infinite, so the distribution is one-hot.
+it seems that policy(π) data saved by self-play are distribution in proportion to pow(N, 1/tau).
+After the middle of the game, the tau becomes 0, so the distribution is one-hot.
 
 `PlayDataConfig#save_policy_of_tau_1 = True` means that the saved policy's tau is always 1. 
 
