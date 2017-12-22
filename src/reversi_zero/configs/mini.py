@@ -34,15 +34,16 @@ class PlayConfig:
         self.disable_resignation_rate = 0.1
         self.false_positive_threshold = 0.05
         self.resign_threshold_delta = 0.01
+        self.use_newest_next_generation_model = True
 
 
 class TrainerConfig:
     def __init__(self):
         self.batch_size = 2048
+        self.min_data_size_to_learn = 100
         self.epoch_to_checkpoint = 1
         self.start_total_steps = 0
-        self.save_model_steps = 1000
-        self.load_data_steps = 1000
+        self.save_model_steps = 200
 
 
 class ModelConfig:

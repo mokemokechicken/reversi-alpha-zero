@@ -5,6 +5,7 @@ from time import sleep
 
 import keras.backend as K
 import numpy as np
+from keras.callbacks import LambdaCallback, Callback
 from keras.optimizers import SGD
 
 from reversi_zero.agent.model import ReversiModel, objective_function_for_policy, \
@@ -20,7 +21,7 @@ logger = getLogger(__name__)
 
 
 def start(config: Config):
-    tf_util.set_session_config(per_process_gpu_memory_fraction=0.59)
+    tf_util.set_session_config(per_process_gpu_memory_fraction=0.65)
     return OptimizeWorker(config).start()
 
 
@@ -39,32 +40,25 @@ class OptimizeWorker:
 
     def training(self):
         self.compile_model()
-        last_load_data_step = last_save_step = total_steps = self.config.trainer.start_total_steps
-        min_data_size_to_learn = 100000
-        self.load_play_data()
+        total_steps = self.config.trainer.start_total_steps
+        save_model_callback = PerStepCallback(self.config.trainer.save_model_steps, self.save_current_model)
+        callbacks = [save_model_callback]
 
         while True:
-            if self.dataset_size < min_data_size_to_learn:
-                logger.info(f"dataset_size={self.dataset_size} is less than {min_data_size_to_learn}")
+            self.load_play_data()
+            if self.dataset_size < self.config.trainer.min_data_size_to_learn:
+                logger.info(f"dataset_size={self.dataset_size} is less than {self.config.trainer.min_data_size_to_learn}")
                 sleep(60)
-                self.load_play_data()
                 continue
             self.update_learning_rate(total_steps)
-            steps = self.train_epoch(self.config.trainer.epoch_to_checkpoint)
-            total_steps += steps
-            if last_save_step + self.config.trainer.save_model_steps < total_steps:
-                self.save_current_model()
-                last_save_step = total_steps
+            total_steps += self.train_epoch(self.config.trainer.epoch_to_checkpoint, callbacks)
 
-            if last_load_data_step + self.config.trainer.load_data_steps < total_steps:
-                self.load_play_data()
-                last_load_data_step = total_steps
-
-    def train_epoch(self, epochs):
+    def train_epoch(self, epochs, callbacks):
         tc = self.config.trainer
         state_ary, policy_ary, z_ary = self.dataset
         self.model.model.fit(state_ary, [policy_ary, z_ary],
                              batch_size=tc.batch_size,
+                             callbacks=callbacks,
                              epochs=epochs)
         steps = (state_ary.shape[0] // tc.batch_size) * epochs
         return steps
@@ -82,12 +76,10 @@ class OptimizeWorker:
 
         if total_steps < 100000:
             lr = 1e-2
-        elif total_steps < 500000:
+        elif total_steps < 200000:
             lr = 1e-3
-        elif total_steps < 900000:
-            lr = 1e-4
         else:
-            lr = 2.5e-5  # means (1e-4 / 4): the paper batch size=2048, ours is 512.
+            lr = 1e-4
         K.set_value(self.optimizer.lr, lr)
         logger.debug(f"total step={total_steps}, set learning rate to {lr}")
 
@@ -186,3 +178,16 @@ class OptimizeWorker:
             z_list.append(z)
 
         return np.array(state_list), np.array(policy_list), np.array(z_list)
+
+
+class PerStepCallback(Callback):
+    def __init__(self, per_step, callback):
+        super().__init__()
+        self.per_step = per_step
+        self.step = 0
+        self.callback = callback
+
+    def on_batch_end(self, batch, logs=None):
+        self.step += 1
+        if self.step % self.per_step == 0:
+            self.callback()

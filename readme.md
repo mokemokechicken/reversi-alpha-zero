@@ -21,6 +21,7 @@ This AlphaGo Zero implementation consists of three worker `self`, `opt` and `eva
 * `self` is Self-Play to generate training data by self-play using BestModel.
 * `opt` is Trainer to train model, and generate next-generation models.
 * `eval` is Evaluator to evaluate whether the next-generation model is better than BestModel. If better, replace BestModel.
+  * If `config.play.use_newest_next_generation_model = True`, this worker is useless. (It is AlphaZero method)
 
 ### Evaluation
 
@@ -80,6 +81,34 @@ Download trained BestModel for example.
 ```bash
 sh ./download_best_model.sh
 ```
+
+Configuration
+--------------
+
+### 'AlphaGo Zero' method and 'AlphaZero' method
+
+I think the main difference between 'AlphaGo Zero' and 'AlphaZero' is whether using `eval` or not.
+It is able to change these methods by configuration.
+
+#### AlphaGo Zero method
+
+* `PlayConfig#use_newest_next_generation_model = False`
+* `PlayWithHumanConfig#use_newest_next_generation_model = False`
+* Execute `Evaluator` to select the best model.
+
+#### AlphaZero method
+
+* `PlayConfig#use_newest_next_generation_model = True`
+* `PlayWithHumanConfig#use_newest_next_generation_model = True`
+* Not use `Evaluator` (the newest model is selected as `self-play`'s model)
+
+### policy distribution of self-play
+
+In DeepMind's paper,
+it seems that policy(π) data saved by self-play are distribution in proportion to pow(N, tau).
+After the middle of the game, the tau becomes infinite, so the distribution is one-hot.
+
+`PlayDataConfig#save_policy_of_tau_1 = True` means that the saved policy's tau is always 1. 
 
 Basic Usages
 ------------
@@ -190,7 +219,10 @@ Training Speed
 * 1 step(mini-batch, batch size=512) in Training: about 2.3 sec.
 
 Model Performance
--------
+===============
+
+Challenge 1(AlphaGo Method)
+------------
 
 The following table is records of the best models.
 For model performance evaluation,
@@ -198,6 +230,8 @@ sometimes I am competing with iOS app(https://itunes.apple.com/ca/app/id57491596
 
 It takes about 2~3 hours to evaluate one model in my environment.
 Therefore, if you divide the time taken by 3, you can see the approximate number of evaluation times.
+
+I changed many parameters for try-and-error.
 
 |best model generation|date|winning percentage to best model|Time Spent(hours)|note|
 |-----|---|-----|-----|-----|
@@ -268,3 +302,21 @@ Therefore, if you divide the time taken by 3, you can see the approximate number
 |63|2017/12/08|57.5%|9|　|
 |64|2017/12/08|56.0%|9|　|
 
+Challenge 2 (AlphaZero Method)
+------------
+
+* use_newest_next_generation_model = True
+* simulation_num_per_move = 400
+* save_policy_of_tau_1 = True
+* c_puct = 1
+* save_model_steps = 200
+
+
+|date|note|
+|:---:|---|
+|2017/12/15|Won the app LV1|
+|2017/12/17|Won the app LV3,5,7,9|
+|2017/12/18|Won the app LV11,13|
+|2017/12/20|Won the app LV14|
+|2017/12/21|Won the app LV15,16,17|
+|2017/12/22|Won the app LV18,19,20,21,22,23|
