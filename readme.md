@@ -327,4 +327,5 @@ Challenge 2 (AlphaZero Method)
 |2017/12/18|Won the app LV11,13|
 |2017/12/20|Won the app LV14|
 |2017/12/21|Won the app LV15,16,17|
-|2017/12/22|Won the app LV18,19,20,21,22,23|
+|2017/12/22|Won the app LV18,19,20,21,22,23,24,25|
+|2017/12/23|Won the app LV26|
