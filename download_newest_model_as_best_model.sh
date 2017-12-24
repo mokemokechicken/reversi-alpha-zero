@@ -6,7 +6,7 @@ cd $(dirname $0)
 
 mkdir -p data/model/
 
-curl -L https://raw.githubusercontent.com/mokemokechicken/reversi-alpha-zero-models/master/newest_model/model_best_config.json -o data/model/model_best_config.json
-curl -L https://raw.githubusercontent.com/mokemokechicken/reversi-alpha-zero-models/master/newest_model/model_best_weight.h5 -o data/model/model_best_weight.h5
+curl -L https://raw.githubusercontent.com/mokemokechicken/reversi-alpha-zero-models/master/newest_model/model_config.json -o data/model/model_best_config.json
+curl -L https://raw.githubusercontent.com/mokemokechicken/reversi-alpha-zero-models/master/newest_model/model_weight.h5 -o data/model/model_best_weight.h5
 
 echo OK
