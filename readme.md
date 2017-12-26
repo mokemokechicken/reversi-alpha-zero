@@ -235,6 +235,7 @@ Challenge 1(AlphaGo Method)
 The following table is records of the best models.
 For model performance evaluation,
 sometimes I am competing with iOS app(https://itunes.apple.com/ca/app/id574915961) and the best model.
+"Won the App LV x" means the model won the level at least once (regardless of the number of losses).
 
 It takes about 2~3 hours to evaluate one model in my environment.
 Therefore, if you divide the time taken by 3, you can see the approximate number of evaluation times.
@@ -330,3 +331,4 @@ Challenge 2 (AlphaZero Method)
 |2017/12/22|Won the app LV18,19,20,21,22,23,24,25|
 |2017/12/23|Won the app LV26|
 |2017/12/24|Won the app LV27,28|
+|2017/12/25|no progress|
