@@ -332,5 +332,6 @@ Challenge 2 (AlphaZero Method)
 |2017/12/23|Won the app LV26|
 |2017/12/24|Won the app LV27,28|
 |2017/12/25|no progress|
-|2017/12/26|Lost the app LV29(0-2)|
-|2017/12/27|Lost the app LV29(0-2)|
+|2017/12/26|Lost the app LV29(0-2) (Model won 0, lost 2)|
+|2017/12/27|Lost the app LV29(0-2) (Model won 0, lost 2)|
+|2017/12/28|Model vs LV29: (1-3) (Model won 1, lost 3)|
