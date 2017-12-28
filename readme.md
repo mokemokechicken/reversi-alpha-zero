@@ -334,4 +334,4 @@ Challenge 2 (AlphaZero Method)
 |2017/12/25|no progress|
 |2017/12/26|Lost the app LV29(0-2) (Model won 0, lost 2)|
 |2017/12/27|Lost the app LV29(0-2) (Model won 0, lost 2)|
-|2017/12/28|Model vs LV29: (1-3) (Model won 1, lost 3)|
+|2017/12/28|Model vs LV29: (2-4) (Model won 2, lost 4), Model vs GRhino LV2: (1-2)|
