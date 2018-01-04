@@ -50,6 +50,7 @@ class TrainerConfig:
         self.epoch_to_checkpoint = 1
         self.start_total_steps = 0
         self.save_model_steps = 200
+        self.use_tensorboard = True
 
 
 class ModelConfig:

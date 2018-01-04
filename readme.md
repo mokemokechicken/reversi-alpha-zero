@@ -216,6 +216,34 @@ After BestModel moves, numbers are displayed on the board.
 * Top left numbers(1) mean 'Visit Count (=N(s,a))' of the last search.
 * Bottom left numbers(2) mean 'Q Value (=Q(s,a)) on AI side' of the last state and move. The Q values are multiplied by 100.
 
+View Training Log in TensorBoard
+----------------
+
+### 1. install tensorboard
+
+```bash
+pip install tensorboard
+```
+
+### 2. launch tensorboard and access by web browser 
+
+```bash
+tensorboard --logdir logs/tensorboard/
+```
+
+And access `http://<The Machine IP>:6006/`.
+
+### Trouble Shooting
+
+If you can not launch tensorboard by error,
+try to create another new plain project which includes only `tensorflow` and `tensorboard`.
+
+And
+
+```bash
+tensorboard --logdir <PATH TO REVERSI DIR>/logs/tensorboard/
+```
+
 
 Tips and Memo
 ====
