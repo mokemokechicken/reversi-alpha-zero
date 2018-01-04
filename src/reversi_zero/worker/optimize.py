@@ -5,7 +5,7 @@ from time import sleep
 
 import keras.backend as K
 import numpy as np
-from keras.callbacks import LambdaCallback, Callback
+from keras.callbacks import Callback
 from keras.optimizers import SGD
 
 from reversi_zero.agent.model import ReversiModel, objective_function_for_policy, \
@@ -16,6 +16,7 @@ from reversi_zero.lib.bitboard import bit_to_array
 from reversi_zero.lib.data_helper import get_game_data_filenames, read_game_data_from_file, \
     get_next_generation_model_dirs
 from reversi_zero.lib.model_helpler import load_best_model_weight
+from reversi_zero.lib.tensorboard_step_callback import TensorBoardStepCallback
 
 logger = getLogger(__name__)
 
@@ -43,6 +44,11 @@ class OptimizeWorker:
         total_steps = self.config.trainer.start_total_steps
         save_model_callback = PerStepCallback(self.config.trainer.save_model_steps, self.save_current_model)
         callbacks = [save_model_callback]
+
+        if self.config.trainer.use_tensorboard:
+            callbacks += [TensorBoardStepCallback(
+                log_dir=self.config.resource.tensorboard_log_dir,
+            )]
 
         while True:
             self.load_play_data()
