@@ -337,3 +337,5 @@ Challenge 2 (AlphaZero Method)
 |2017/12/28|Model vs LV29: (2-4) (Model won 2, lost 4), Model vs GRhino LV2: (1-2)|
 |2017/12/29|Model vs LV30: (1-2), Model vs GRhino LV2: (0-3)|
 |2017/12/30|Model vs LV31: (0-2), Model vs GRhino LV2: (2-2)|
+|2017/12/31|Model vs LV31: (0-2)|
+|2018/01/04|Change max_file_num from 2000 to 300 (#26)|
