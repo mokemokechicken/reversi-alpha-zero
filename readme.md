@@ -118,6 +118,23 @@ After the middle of the game, the tau becomes 0, so the distribution is one-hot.
 
 `PlayDataConfig#save_policy_of_tau_1 = True` means that the saved policy's tau is always 1. 
 
+## other important hyper-parameters (I think)
+
+If you find a good parameter set, please share in the github issues!
+
+### PlayDataConfig
+
+* `nb_game_in_file,max_file_num`: The max sample number of training data is `nb_game_in_file * max_file_num`.
+
+### PlayConfig, PlayWithHumanConfig
+
+* `simulation_num_per_move` : MCTS number per move.
+* `c_puct`: balance parameter of value network and policy network in MCTS.
+* `resign_threshold`: resign threshold
+* `parallel_search_num`: balance parameter(?) of speed and accuracy in MCTS.
+  * `prediction_queue_size` should be same or greater than `parallel_search_num`.
+* `dirichlet_alpha`: random parameter in self-play.
+
 Basic Usages
 ------------
 
