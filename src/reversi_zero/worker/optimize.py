@@ -43,12 +43,15 @@ class OptimizeWorker:
         self.compile_model()
         total_steps = self.config.trainer.start_total_steps
         save_model_callback = PerStepCallback(self.config.trainer.save_model_steps, self.save_current_model)
-        callbacks = [save_model_callback]
+        callbacks = [save_model_callback]  # type: list[Callback]
+        tb_callback = None  # type: TensorBoardStepCallback
 
         if self.config.trainer.use_tensorboard:
-            callbacks += [TensorBoardStepCallback(
+            tb_callback = TensorBoardStepCallback(
                 log_dir=self.config.resource.tensorboard_log_dir,
-            )]
+                logging_per_steps=self.config.trainer.logging_per_steps,
+            )
+            callbacks.append(tb_callback)
 
         while True:
             self.load_play_data()
@@ -58,6 +61,9 @@ class OptimizeWorker:
                 continue
             self.update_learning_rate(total_steps)
             total_steps += self.train_epoch(self.config.trainer.epoch_to_checkpoint, callbacks)
+
+        if tb_callback:  # This code is never reached. But potentially this is required.
+            tb_callback.close()
 
     def train_epoch(self, epochs, callbacks):
         tc = self.config.trainer

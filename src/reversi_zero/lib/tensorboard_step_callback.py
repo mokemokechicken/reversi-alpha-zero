@@ -29,5 +29,5 @@ class TensorBoardStepCallback(Callback):
             self.writer.add_summary(summary, self.step)
         self.writer.flush()
 
-    def on_train_end(self, logs=None):
+    def close(self):
         self.writer.close()
