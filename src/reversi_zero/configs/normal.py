@@ -51,6 +51,7 @@ class TrainerConfig:
         self.start_total_steps = 0
         self.save_model_steps = 200
         self.use_tensorboard = True
+        self.logging_per_steps = 100
 
 
 class ModelConfig:
