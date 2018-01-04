@@ -124,7 +124,7 @@ If you find a good parameter set, please share in the github issues!
 
 ### PlayDataConfig
 
-* `nb_game_in_file,max_file_num`: The max sample number of training data is `nb_game_in_file * max_file_num`.
+* `nb_game_in_file,max_file_num`: The max game number of training data is `nb_game_in_file * max_file_num`.
 
 ### PlayConfig, PlayWithHumanConfig
 
