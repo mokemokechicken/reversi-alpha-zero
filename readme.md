@@ -384,3 +384,4 @@ Challenge 2 (AlphaZero Method)
 |2017/12/30|Model vs LV31: (0-2), Model vs GRhino LV2: (2-2)|
 |2017/12/31|Model vs LV31: (0-2)|
 |2018/01/04|Change max_file_num from 2000 to 300 (#26)|
+|2018/01/05|Model vs LV31: (3-2), Model vs GRhino LV2: (4-1), vs Grhino LV3: (2-1)|
