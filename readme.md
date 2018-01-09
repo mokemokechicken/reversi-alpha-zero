@@ -387,3 +387,4 @@ Challenge 2 (AlphaZero Method)
 |2018/01/05|Model vs LV31: (3-2), Model vs GRhino LV2: (4-1), vs Grhino LV3: (2-1)|
 |2018/01/06|(win, lose, draw): vs Grhino LV3 (0, 1, 2)|
 |2018/01/08|(win, lose, draw): vs Grhino LV3 (0, 5, 0)|
+|2018/01/08|change virtual_loss=30: (win, lose, draw): vs Grhino LV3 (2, 2, 0)|
