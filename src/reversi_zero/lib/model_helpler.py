@@ -6,13 +6,14 @@ import keras.backend as K
 logger = getLogger(__name__)
 
 
-def load_best_model_weight(model):
+def load_best_model_weight(model, clear_session=False):
     """
 
     :param reversi_zero.agent.model.ReversiModel model:
     :return:
     """
-    K.clear_session()
+    if clear_session:
+        K.clear_session()
     return model.load(model.config.resource.model_best_config_path, model.config.resource.model_best_weight_path)
 
 
@@ -40,7 +41,7 @@ def reload_best_model_weight_if_changed(model):
     return False
 
 
-def reload_newest_next_generation_model_if_changed(model):
+def reload_newest_next_generation_model_if_changed(model, clear_session=False):
     """
 
     :param reversi_zero.agent.model.ReversiModel model:
@@ -59,7 +60,8 @@ def reload_newest_next_generation_model_if_changed(model):
     digest = model.fetch_digest(weight_path)
     if digest != model.digest:
         logger.debug(f"Loading weight from {model_dir}")
-        K.clear_session()
+        if clear_session:
+            K.clear_session()
         return model.load(config_path, weight_path)
     else:
         return logger.debug("The newest model is not changed.")
