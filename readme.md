@@ -392,4 +392,5 @@ Challenge 2 (AlphaZero Method)
 |2018/01/10|(win, lose, draw): vs Grhino LV3 (1, 1, 0), vs App LV33 (1, 1, 0), vs App LV34 ()|
 |2018/01/10|change resign_threshold from -0.9 to -0.95|
 |2018/01/11|change change_tau_turn from 10 to 3|
+|2018/01/11|(win, lose, draw): vs Grhino LV3 (2, 1, 0)|
 
