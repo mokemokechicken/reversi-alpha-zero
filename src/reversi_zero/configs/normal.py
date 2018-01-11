@@ -27,13 +27,13 @@ class PlayConfig:
         self.c_puct = 1
         self.noise_eps = 0.25
         self.dirichlet_alpha = 0.5
-        self.change_tau_turn = 10
+        self.change_tau_turn = 3
         self.virtual_loss = 3 * 10
         self.prediction_queue_size = 16
         self.parallel_search_num = 8
         self.prediction_worker_sleep_sec  = 0.0001
         self.wait_for_expanding_sleep_sec = 0.00001
-        self.resign_threshold = -0.9
+        self.resign_threshold = -0.95
         self.disable_resignation_rate = 0.1
         self.false_positive_threshold = 0.05
         self.resign_threshold_delta = 0.01
