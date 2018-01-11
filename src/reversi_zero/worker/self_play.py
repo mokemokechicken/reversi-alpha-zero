@@ -53,9 +53,9 @@ class SelfPlayWorker:
                          f"turn={env.turn}:{env.board.number_of_black_and_white}")
             if True or (idx % self.config.play_data.nb_game_in_file) == 0:
                 if self.config.play.use_newest_next_generation_model:
-                    reload_newest_next_generation_model_if_changed(self.model)
+                    reload_newest_next_generation_model_if_changed(self.model, clear_session=True)
                 else:
-                    if reload_best_model_weight_if_changed(self.model):
+                    if reload_best_model_weight_if_changed(self.model, clear_session=True):
                         self.reset_false_positive_count()
 
             idx += 1
