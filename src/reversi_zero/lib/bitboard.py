@@ -157,3 +157,15 @@ def rotate90(x):
 
 def rotate180(x):
     return rotate90(rotate90(x))
+
+
+def dirichlet_noise_of_mask(mask, alpha):
+    num_1 = bit_count(mask)
+    noise = list(np.random.dirichlet([alpha] * num_1))
+    ret_list = []
+    for i in range(64):
+        if (1 << i) & mask:
+            ret_list.append(noise.pop(0))
+        else:
+            ret_list.append(0)
+    return np.array(ret_list)

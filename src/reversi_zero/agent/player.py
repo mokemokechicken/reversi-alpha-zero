@@ -10,7 +10,7 @@ from numpy.random import random
 from reversi_zero.agent.api import ReversiModelAPI
 from reversi_zero.config import Config
 from reversi_zero.env.reversi_env import ReversiEnv, Player, Winner
-from reversi_zero.lib.bitboard import find_correct_moves, bit_to_array, flip_vertical, rotate90
+from reversi_zero.lib.bitboard import find_correct_moves, bit_to_array, flip_vertical, rotate90, dirichlet_noise_of_mask
 
 CounterKey = namedtuple("CounterKey", "black white next_player")
 QueueItem = namedtuple("QueueItem", "state future")
@@ -291,9 +291,12 @@ class ReversiPlayer:
         xx_ = max(xx_, 1)  # avoid u_=0 if N is all 0
         p_ = self.var_p[key]
 
-        if is_root_node:  # Is it correct?? -> (1-e)p + e*Dir(alpha)
-            p_ = (1 - self.play_config.noise_eps) * p_ + \
-                 self.play_config.noise_eps * np.random.dirichlet([self.play_config.dirichlet_alpha] * 64)
+        if is_root_node and self.play_config.noise_eps > 0:  # Is it correct?? -> (1-e)p + e*Dir(alpha)
+            if self.play_config.dirichlet_noise_only_for_legal_moves:
+                noise = dirichlet_noise_of_mask(legal_moves, self.play_config.dirichlet_alpha)
+            else:
+                noise = np.random.dirichlet([self.play_config.dirichlet_alpha] * 64)
+            p_ = (1 - self.play_config.noise_eps) * p_ + self.play_config.noise_eps * noise
 
         # re-normalize in legal moves
         p_ = p_ * bit_to_array(legal_moves, 64)
