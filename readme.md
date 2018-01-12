@@ -313,7 +313,7 @@ virtual_loss is a little smaller.
 Dirichlet noise to the root node in MCTS is applied only to legal moves.
 
 * 2018/01/12: chnage max_file_num from 60 to 100, because training data size was less then 100,000.
-
+* 2017/01/12: it seems that too small max_file_num makes large bias training data, and leads to early false positive resign.
 
 Challenge 1(AlphaGo Method)
 ------------
