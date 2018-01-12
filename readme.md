@@ -294,7 +294,7 @@ About
 |c_puct|5(maybe)|5(maybe)|1~3|1|1|
 |virtual_loss|3(maybe)|3(maybe)|3|3 -> 30|10|
 |dirichlet_alpha|　|　|　|0.5|0.5|
-|max number of games in training data|　|　|200 * 50|2000 * 5 -> 300 * 5|400 * 5|
+|max number of games in training data|　|　|200 * 50|2000 * 5 -> 300 * 5|60 * 5|
 |change_tau_turn|30|　|10|10|3|
 |dirichlet_noise_only_for_legal_moves|?|?|FALSE|FALSE|TRUE|
 
@@ -308,7 +308,7 @@ Changing "max number of games in training data (max_file_num 2000 -> 300)" made 
 It seems that changing virtual loss from 3 to 30 on the way of training made model collapse some degree.  
 
 ### Challenge 3
-Trying small simulation_num_per_move. 
+Trying small simulation_num_per_move and max_file_num. 
 virtual_loss is a little smaller.
 Dirichlet noise to the root node in MCTS is applied only to legal moves.
 
