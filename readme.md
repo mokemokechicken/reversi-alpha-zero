@@ -292,7 +292,7 @@ About
 |simulation_num_per_move|1600|800|?|400|100|
 |save_policy_of_tau_1|FALSE(maybe)|FALSE(maybe)|FALSE|TRUE|TRUE|
 |c_puct|5(maybe)|5(maybe)|1~3|1|1|
-|virtual_loss|3(maybe)|3(maybe)|3|3 -> 30|10|
+|virtual_loss|3(maybe)|3(maybe)|3|3 -> 30|10 -> 3|
 |dirichlet_alpha|　|　|　|0.5|0.5|
 |max number of games in training data|　|　|200 * 50|2000 * 5 -> 300 * 5|60 * 5 -> 100 * 5|
 |change_tau_turn|30|　|10|10|3|

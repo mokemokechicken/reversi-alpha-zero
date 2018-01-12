@@ -29,12 +29,13 @@ class PlayConfig:
         self.dirichlet_alpha = 0.5
         self.dirichlet_noise_only_for_legal_moves = True
         self.change_tau_turn = 3
-        self.virtual_loss = 10
+        self.virtual_loss = 3
         self.prediction_queue_size = 16
         self.parallel_search_num = 8
         self.prediction_worker_sleep_sec  = 0.0001
         self.wait_for_expanding_sleep_sec = 0.00001
         self.resign_threshold = -0.9
+        self.allowed_resign_turn = 40
         self.disable_resignation_rate = 0.1
         self.false_positive_threshold = 0.05
         self.resign_threshold_delta = 0.01

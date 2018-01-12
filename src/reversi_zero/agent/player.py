@@ -75,11 +75,14 @@ class ReversiPlayer:
         self.thinking_history[(own, enemy)] = HistoryItem(action, policy, list(self.var_q[key]), list(self.var_n[key]),
                                                           list(self.var_q[next_key]), list(self.var_n[next_key]))
 
-        if self.play_config.resign_threshold is not None and \
+        if self.play_config.resign_threshold is not None and\
                         np.max(self.var_q[key] - (self.var_n[key] == 0)*10) <= self.play_config.resign_threshold:
             self.resigned = True
             if self.enable_resign:
-                return None  # means resign
+                if env.turn >= self.config.play.allowed_resign_turn:
+                    return None  # means resign
+                else:
+                    logger.debug(f"Want to resign but disallowed turn {env.turn} < {self.config.play.allowed_resign_turn}")
 
         saved_policy = self.calc_policy_by_tau_1(key) if self.config.play_data.save_policy_of_tau_1 else policy
         self.add_data_to_move_buffer_with_8_symmetries(own, enemy, saved_policy)
