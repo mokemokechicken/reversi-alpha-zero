@@ -84,10 +84,16 @@ sh ./download_best_model.sh
 
 ### Download Trained the Newest Model(If needed)
 
-Download trained the newest model(trained by Challenge 2) as BestModel.
+Download trained the newest model(trained by Challenge 2, 3) as BestModel.
 
 ```bash
-sh ./download_newest_model_as_best_model.sh
+sh ./download_model.sh <version>
+```
+
+ex)
+
+```bash
+sh ./download_model.sh 2
 ```
 
 Configuration
@@ -288,7 +294,7 @@ About
 |c_puct|5(maybe)|5(maybe)|1~3|1|1|
 |virtual_loss|3(maybe)|3(maybe)|3|3 -> 30|10|
 |dirichlet_alpha|　|　|　|0.5|0.5|
-|max number of games in training data|　|　|200*50|2000*5 -> 300*5|400*5|
+|max number of games in training data|　|　|200 * 50|2000 * 5 -> 300 * 5|400 * 5|
 |change_tau_turn|30|　|10|10|3|
 |dirichlet_noise_only_for_legal_moves|?|?|FALSE|FALSE|TRUE|
 
