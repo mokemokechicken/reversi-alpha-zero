@@ -15,7 +15,7 @@ class PlayDataConfig:
     def __init__(self):
         # Max Training Data Size = nb_game_in_file * max_file_num * 8
         self.nb_game_in_file = 5
-        self.max_file_num = 60
+        self.max_file_num = 100
         self.save_policy_of_tau_1 = True
 
 
