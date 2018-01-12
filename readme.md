@@ -233,6 +233,8 @@ tensorboard --logdir logs/tensorboard/
 
 And access `http://<The Machine IP>:6006/`.
 
+<img src="doc/img/tensorboard.png">
+
 ### Trouble Shooting
 
 If you can not launch tensorboard by error,
