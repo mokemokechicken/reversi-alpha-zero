@@ -15,13 +15,13 @@ class PlayDataConfig:
     def __init__(self):
         # Max Training Data Size = nb_game_in_file * max_file_num * 8
         self.nb_game_in_file = 5
-        self.max_file_num = 300
+        self.max_file_num = 400
         self.save_policy_of_tau_1 = True
 
 
 class PlayConfig:
     def __init__(self):
-        self.simulation_num_per_move = 400
+        self.simulation_num_per_move = 100
         self.thinking_loop = 1
         self.logging_thinking = False
         self.c_puct = 1
@@ -29,12 +29,12 @@ class PlayConfig:
         self.dirichlet_alpha = 0.5
         self.dirichlet_noise_only_for_legal_moves = True
         self.change_tau_turn = 3
-        self.virtual_loss = 3 * 10
+        self.virtual_loss = 10
         self.prediction_queue_size = 16
         self.parallel_search_num = 8
         self.prediction_worker_sleep_sec  = 0.0001
         self.wait_for_expanding_sleep_sec = 0.00001
-        self.resign_threshold = -0.95
+        self.resign_threshold = -0.9
         self.disable_resignation_rate = 0.1
         self.false_positive_threshold = 0.05
         self.resign_threshold_delta = 0.01

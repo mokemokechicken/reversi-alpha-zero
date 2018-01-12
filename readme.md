@@ -273,8 +273,39 @@ Training Speed
 * 1 game in Evaluation: about 50 sec (simulation_num_per_move = 100, thinking_loop = 5).
 * 1 step(mini-batch, batch size=512) in Training: about 2.3 sec.
 
-Model Performance
+Challenges
 ===============
+
+About
+--------
+
+|-|AlphaGo Zero|AlphaZero|Challenge 1|Challenge 2|Challenge 3|
+|-----|-----|-----|-----|-----|-----|
+|Worker|self, opt, eval|self, opt|self, opt, eval|self, opt|self, opt|
+|use_newest_next_generation_model|FALSE|TRUE|FALSE|TRUE|TRUE|
+|simulation_num_per_move|1600|800|?|400|100|
+|save_policy_of_tau_1|FALSE(maybe)|FALSE(maybe)|FALSE|TRUE|TRUE|
+|c_puct|5(maybe)|5(maybe)|1~3|1|1|
+|virtual_loss|3(maybe)|3(maybe)|3|3 -> 30|10|
+|dirichlet_alpha|　|　|　|0.5|0.5|
+|max number of games in training data|　|　|200*50|2000*5 -> 300*5|400*5|
+|change_tau_turn|30|　|10|10|3|
+|dirichlet_noise_only_for_legal_moves|?|?|FALSE|FALSE|TRUE|
+
+### Challenge 1
+It became strong to a certain extent, but it took time to grow.
+We often changed the hyper parameters on the way.
+
+### Challenge 2
+It became as strong as GRhino LV3 (maybe). It almost won GRhino LV2 finally.
+Changing "max number of games in training data (max_file_num 2000 -> 300)" made improvement faster.
+It seems that changing virtual loss from 3 to 30 on the way of training made model collapse some degree.  
+
+### Challenge 3
+Trying small simulation_num_per_move. 
+virtual_loss is a little smaller.
+Dirichlet noise to the root node in MCTS is applied only to legal moves.
+
 
 Challenge 1(AlphaGo Method)
 ------------
@@ -367,7 +398,6 @@ Challenge 2 (AlphaZero Method)
 * c_puct = 1
 * save_model_steps = 200
 
-
 |date|note|
 |:---:|---|
 |2017/12/15|Won the app LV1|
@@ -395,4 +425,11 @@ Challenge 2 (AlphaZero Method)
 |2018/01/10|change resign_threshold from -0.9 to -0.95|
 |2018/01/11|change change_tau_turn from 10 to 3|
 |2018/01/11|(win, lose, draw): vs Grhino LV3 (2, 1, 0)|
+
+Challenge 3 (AlphaZero Method)
+------------
+
+|date|note|
+|:---:|---|
+|2017/01/12|start|
 
