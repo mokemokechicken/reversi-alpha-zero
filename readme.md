@@ -250,12 +250,13 @@ However, it can select different engines of play-engine and analysis-engine.
 
 So, convenient way to evaluate your model is for example,
 
-* select this engine as play-engine, another engine as analysis-engine.
+* select this engine as play-engine (or analysis-engine), another engine as analysis-engine (or play-engine).
 * check menu `View -> Highlight Best Move`
 * start `User plays Black`(or White)
 * You simply choose the best move of analysis-engine.
 
-(if this project implements "analysis protocol", it can play with any engine...)
+I have little confidence about `hint` protocol as analysis-engine (there is odd behavior), 
+but work in my environment.
 
 
 View Training Log in TensorBoard
