@@ -17,7 +17,7 @@ logger = getLogger(__name__)
 
 GAME_STATE = namedtuple("GAME_STATE", "black white actions player")
 GO_RESPONSE = namedtuple("GO_RESPONSE", "action eval time")
-
+HINT_RESPONSE = namedtuple("HINT_RESPONSE", "action value visit")
 
 def start(config: Config):
     root_logger = getLogger()
@@ -38,8 +38,12 @@ class NBoardEngine:
         self.env = ReversiEnv().reset()
         self.model = load_model(self.config)
         self.play_config = self.config.play
-        self.player = ReversiPlayer(self.config, self.model, self.play_config, enable_resign=False)
+        self.player = self.create_player()
         self.turn_of_nboard = None
+
+    def create_player(self):
+        logger.debug("create new ReversiPlayer()")
+        return ReversiPlayer(self.config, self.model, self.play_config, enable_resign=False)
 
     def start(self):
         self.running = True
@@ -70,6 +74,9 @@ class NBoardEngine:
             logger.info(f"set simulation_num_per_move to {self.play_config.simulation_num_per_move}")
         except ValueError:
             pass
+
+    def reset_state(self):
+        self.player = self.create_player()
 
     def set_game(self, game_state: GAME_STATE):
         self.env.reset()
@@ -104,6 +111,27 @@ class NBoardEngine:
         evaluation = item.values[action]
         time_took = time() - start_time
         return GO_RESPONSE(action, evaluation, time_took)
+
+    def hint(self, n_hint):
+        """
+
+        :param n_hint:
+        :rtype: list[HINT_RESPONSE]
+        """
+        board = self.env.board
+        if self.env.next_player == Player.black:
+            states = (board.black, board.white)
+        else:
+            states = (board.white, board.black)
+        self.player.action(*states)
+        item = self.player.ask_thought_about(*states)
+        values = item.values
+        visits = item.visit
+        hint_list = []
+        for action, visit in list(sorted(enumerate(visits), key=lambda x: -x[1]))[:n_hint]:
+            if visit > 0:
+                hint_list.append(HINT_RESPONSE(action, values[action], visit))
+        return hint_list
 
 
 class NBoardProtocolVersion2:
@@ -145,9 +173,12 @@ class NBoardProtocolVersion2:
         """Set engine midgame search depth.
 
         Optional: Set midgame depth to {maxDepth}. Endgame depths are at the engine author's discretion.
+
+        "set_depth" is sent at beginning of the game, so reset engine state.
         :param depth:
         """
         self.engine.set_depth(depth)
+        self.engine.reset_state()
 
     def set_game(self, ggf_str):
         """Tell the engine that all further commands relate to the position at the end of the given game, in GGF format.
@@ -209,8 +240,12 @@ class NBoardProtocolVersion2:
 
         :param n:
         """
-        # not implemented
-        self.engine.reply("search PA 0 0 1 not implemented")
+        self.tell_status("thinkng hint...")
+        hint_list = self.engine.hint(int(n))
+        for hint in reversed(hint_list):  # there is a rule that the last is best?
+            move = convert_action_to_move(hint.action)
+            self.engine.reply(f"search {move} {hint.value} 0 {int(hint.visit)}")
+        self.tell_status("waiting")
 
     def go(self):
         """Tell the engine to decide what move it would play.
