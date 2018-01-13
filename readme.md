@@ -213,7 +213,7 @@ conda install python.app
 pythonw src/reversi_zero/run.py play_gui
 ```
 
-<img src="doc/img/play_gui.png">
+<img src="doc/img/play_gui.png" width="50%">
 
 
 When executed, ordinary reversi board will be displayed and you can play against BestModel.
@@ -221,6 +221,42 @@ After BestModel moves, numbers are displayed on the board.
 
 * Top left numbers(1) mean 'Visit Count (=N(s,a))' of the last search.
 * Bottom left numbers(2) mean 'Q Value (=Q(s,a)) on AI side' of the last state and move. The Q values are multiplied by 100.
+
+Run as NBoard2.0 Engine
+--------------
+
+[NBoard](http://www.orbanova.com/nboard/) is a very good reversi GUI and has strong reversi engines, 
+which runs on Windows, Mac, and Linux (JRE required).
+
+<img src="doc/img/nboard.png" width="50%">
+
+It can add external engines that implement [NBoard Protocol](https://github.com/weltyc/ntest/blob/master/instructions/Protocol.htm).
+
+### How to add this model as an external engine to NBoard
+
+* (1) select menu `Engine -> Select Opponent...`
+* (2) clike button `Add Engine`
+* (3) set parameter:
+  * `Name` = `RAZ` (for example)
+  * `Working Directory` = PATH TO THIS PROJECT
+  * `Command` = `nboard_engine` or `bash nboard_engine`
+
+<img src="doc/img/add_to_nboard.png" width="50%">
+
+### convenient way to evaluate your model
+
+NBoard cannot play with two different engines (maybe).
+However, it can select different engines of play-engine and analysis-engine.
+
+So, convenient way to evaluate your model is for example,
+
+* select this engine as play-engine, another engine as analysis-engine.
+* check menu `View -> Highlight Best Move`
+* start `User plays Black`(or White)
+* You simply choose the best move of analysis-engine.
+
+(if this project implements "analysis protocol", it can play with any engine...)
+
 
 View Training Log in TensorBoard
 ----------------
