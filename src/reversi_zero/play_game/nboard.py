@@ -173,12 +173,9 @@ class NBoardProtocolVersion2:
         """Set engine midgame search depth.
 
         Optional: Set midgame depth to {maxDepth}. Endgame depths are at the engine author's discretion.
-
-        "set_depth" is sent at beginning of the game, so reset engine state.
         :param depth:
         """
         self.engine.set_depth(depth)
-        self.engine.reset_state()
 
     def set_game(self, ggf_str):
         """Tell the engine that all further commands relate to the position at the end of the given game, in GGF format.
@@ -190,6 +187,10 @@ class NBoardProtocolVersion2:
         black, white, actions = convert_to_bitboard_and_actions(ggf)
         player = Player.black if ggf.BO.color == "*" else Player.white
         self.engine.set_game(GAME_STATE(black, white, actions, player))
+
+        # if set_game at turn=1~2 is sent, reset engine state.
+        if len(actions) <= 1:
+            self.engine.reset_state()  # clear MCTS cache
 
     def move(self, move, evaluation, time_sec):
         """Tell the engine that all further commands relate to the position after the given move.
