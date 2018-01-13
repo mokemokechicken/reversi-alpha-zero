@@ -15,6 +15,7 @@ from reversi_zero.lib.bitboard import find_correct_moves, bit_to_array, flip_ver
 CounterKey = namedtuple("CounterKey", "black white next_player")
 QueueItem = namedtuple("QueueItem", "state future")
 HistoryItem = namedtuple("HistoryItem", "action policy values visit enemy_values enemy_visit")
+CallbackInMCTS = namedtuple("CallbackInMCTS", "per_sim callback")
 
 logger = getLogger(__name__)
 
@@ -45,19 +46,22 @@ class ReversiPlayer:
         self.moves = []
         self.loop = asyncio.get_event_loop()
         self.running_simulation_num = 0
+        self.callback_in_mtcs = None
 
         self.thinking_history = {}  # for fun
         self.resigned = False
 
-    def action(self, own, enemy):
+    def action(self, own, enemy, callback_in_mtcs=None):
         """
 
         :param own: BitBoard
         :param enemy:  BitBoard
+        :param CallbackInMCTS callback_in_mtcs:
         :return: action: move pos=0 ~ 63 (0=top left, 7 top right, 63 bottom right)
         """
         env = ReversiEnv().update(own, enemy, Player.black)
         key = self.counter_key(env)
+        self.callback_in_mtcs = callback_in_mtcs
 
         for tl in range(self.play_config.thinking_loop):
             if tl > 0 and self.play_config.logging_thinking:
@@ -125,10 +129,14 @@ class ReversiPlayer:
 
     async def start_search_my_move(self, own, enemy):
         self.running_simulation_num += 1
+        root_key = self.counter_key(ReversiEnv().update(own, enemy, Player.black))
         with await self.sem:  # reduce parallel search number
             env = ReversiEnv().update(own, enemy, Player.black)
             leaf_v = await self.search_my_move(env, is_root_node=True)
             self.running_simulation_num -= 1
+            if self.callback_in_mtcs and self.callback_in_mtcs.per_sim > 0 and \
+                    self.running_simulation_num % self.callback_in_mtcs.per_sim == 0:
+                self.callback_in_mtcs.callback(list(self.var_q[root_key]), list(self.var_n[root_key]))
             return leaf_v
 
     async def search_my_move(self, env: ReversiEnv, is_root_node=False):

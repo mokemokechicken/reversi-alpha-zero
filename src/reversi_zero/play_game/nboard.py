@@ -5,7 +5,7 @@ from collections import namedtuple
 from logging import getLogger, StreamHandler, FileHandler
 from time import time
 
-from reversi_zero.agent.player import ReversiPlayer
+from reversi_zero.agent.player import ReversiPlayer, CallbackInMCTS
 from reversi_zero.config import Config
 from reversi_zero.env.reversi_env import ReversiEnv, Player
 from reversi_zero.lib.ggf import parse_ggf, convert_to_bitboard_and_actions, convert_move_to_action, \
@@ -123,15 +123,18 @@ class NBoardEngine:
             states = (board.black, board.white)
         else:
             states = (board.white, board.black)
-        self.player.action(*states)
+
+        def hint_report_callback(values, visits):
+            hint_list = []
+            for action, visit in list(sorted(enumerate(visits), key=lambda x: -x[1]))[:n_hint]:
+                if visit > 0:
+                    hint_list.append(HINT_RESPONSE(action, values[action], visit))
+            self.handler.hint_report(hint_list)
+
+        callback_info = CallbackInMCTS(self.config.nboard.hint_callback_per_sim, hint_report_callback)
+        self.player.action(*states, callback_in_mtcs=callback_info)
         item = self.player.ask_thought_about(*states)
-        values = item.values
-        visits = item.visit
-        hint_list = []
-        for action, visit in list(sorted(enumerate(visits), key=lambda x: -x[1]))[:n_hint]:
-            if visit > 0:
-                hint_list.append(HINT_RESPONSE(action, values[action], visit))
-        return hint_list
+        hint_report_callback(item.values, item.visit)
 
 
 class NBoardProtocolVersion2:
@@ -242,11 +245,13 @@ class NBoardProtocolVersion2:
         :param n:
         """
         self.tell_status("thinkng hint...")
-        hint_list = self.engine.hint(int(n))
+        self.engine.hint(int(n))
+        self.tell_status("waiting")
+
+    def hint_report(self, hint_list):
         for hint in reversed(hint_list):  # there is a rule that the last is best?
             move = convert_action_to_move(hint.action)
             self.engine.reply(f"search {move} {hint.value} 0 {int(hint.visit)}")
-        self.tell_status("waiting")
 
     def go(self):
         """Tell the engine to decide what move it would play.
