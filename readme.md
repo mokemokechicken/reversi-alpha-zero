@@ -234,6 +234,8 @@ It can add external engines that implement [NBoard Protocol](https://github.com/
 
 ### How to add this model as an external engine to NBoard
 
+* (0) launch NBoard from command line(need environment variables like PATH) 
+  * ex) `java -jar /Applications/NBoard/nboard-2.0.jar`
 * (1) select menu `Engine -> Select Opponent...`
 * (2) clike button `Add Engine`
 * (3) set parameter:
