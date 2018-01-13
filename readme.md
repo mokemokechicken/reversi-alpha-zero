@@ -242,6 +242,7 @@ It can add external engines that implement [NBoard Protocol](https://github.com/
   * `Name` = `RAZ` (for example)
   * `Working Directory` = PATH TO THIS PROJECT
   * `Command` = `nboard_engine` or `bash nboard_engine`
+* (4) Engine Level N is set as `simulation_num_per_move=N*20`
 
 <img src="doc/img/add_to_nboard.png" width="50%">
 
@@ -493,9 +494,12 @@ Challenge 3 (AlphaZero Method)
 
 Challenge 4 (AlphaZero Method)
 ------------
+(Win, Lose, Draw)
+Vs NBoard Engine.
 
 |date|note|
 |:---:|---|
 |2017/01/13|start|
+|2017/01/14|Ethelred Lv4=(0, 1, 0)|
 
 
