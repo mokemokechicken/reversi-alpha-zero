@@ -7,6 +7,7 @@ from reversi_zero.config import Config
 from reversi_zero.env.reversi_env import Player, ReversiEnv
 from reversi_zero.lib.bitboard import find_correct_moves
 from reversi_zero.lib.model_helpler import load_best_model_weight, reload_newest_next_generation_model_if_changed
+from reversi_zero.play_game.common import load_model
 
 logger = getLogger(__name__)
 
@@ -89,15 +90,7 @@ class PlayWithHuman:
         self.env.step(pos)
 
     def _load_model(self):
-        from reversi_zero.agent.model import ReversiModel
-        model = ReversiModel(self.config)
-        if self.config.play.use_newest_next_generation_model:
-            loaded = reload_newest_next_generation_model_if_changed(model) or load_best_model_weight(model)
-        else:
-            loaded = load_best_model_weight(model) or reload_newest_next_generation_model_if_changed(model)
-        if not loaded:
-            raise RuntimeError("No models found!")
-        return model
+        return load_model(self.config)
 
     def move_by_ai(self):
         if self.next_player == self.human_color:

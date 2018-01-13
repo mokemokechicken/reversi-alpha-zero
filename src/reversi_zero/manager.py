@@ -7,7 +7,7 @@ from .config import Config
 
 logger = getLogger(__name__)
 
-CMD_LIST = ['self', 'opt', 'eval', 'play_gui']
+CMD_LIST = ['self', 'opt', 'eval', 'play_gui', 'nboard']
 
 
 def create_parser():
@@ -35,7 +35,8 @@ def start():
     config = Config(config_type=config_type)
     setup(config, args)
 
-    logger.info(f"config type: {config_type}")
+    if args.cmd != "nboard":
+        logger.info(f"config type: {config_type}")
 
     if args.cmd == "self":
         from .worker import self_play
@@ -49,3 +50,6 @@ def start():
     elif args.cmd == 'play_gui':
         from .play_game import gui
         return gui.start(config)
+    elif args.cmd == 'nboard':
+        from .play_game import nboard
+        return nboard.start(config)
