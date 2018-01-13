@@ -177,11 +177,12 @@ class ReversiPlayer:
             else:
                 return -leaf_v  # Value for white == -Value for black
 
+        virtual_loss = self.config.play.virtual_loss
+        virtual_loss_for_w = virtual_loss if env.next_player == Player.black else -virtual_loss
+
         action_t = self.select_action_q_and_u(env, is_root_node)
         _, _ = env.step(action_t)
 
-        virtual_loss = self.config.play.virtual_loss
-        virtual_loss_for_w = virtual_loss if env.next_player == Player.black else -virtual_loss
         self.var_n[key][action_t] += virtual_loss
         self.var_w[key][action_t] -= virtual_loss_for_w
         self.var_q[key][action_t] = self.var_w[key][action_t] / self.var_n[key][action_t]
