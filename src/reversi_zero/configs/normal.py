@@ -15,7 +15,7 @@ class PlayDataConfig:
     def __init__(self):
         # Max Training Data Size = nb_game_in_file * max_file_num * 8
         self.nb_game_in_file = 5
-        self.max_file_num = 100
+        self.max_file_num = 300
         self.save_policy_of_tau_1 = True
 
 
@@ -35,7 +35,7 @@ class PlayConfig:
         self.prediction_worker_sleep_sec  = 0.0001
         self.wait_for_expanding_sleep_sec = 0.00001
         self.resign_threshold = -0.9
-        self.allowed_resign_turn = 40
+        self.allowed_resign_turn = 20
         self.disable_resignation_rate = 0.1
         self.false_positive_threshold = 0.05
         self.resign_threshold_delta = 0.01

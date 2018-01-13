@@ -86,9 +86,9 @@ class OptimizeWorker:
         # 400k~600k: 1e-3
         # 600k~: 1e-4
 
-        if total_steps < 10000:
+        if total_steps < 100000:
             lr = 1e-2
-        elif total_steps < 50000:
+        elif total_steps < 200000:
             lr = 1e-3
         else:
             lr = 1e-4

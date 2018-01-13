@@ -322,18 +322,18 @@ Challenges
 About
 --------
 
-|-|AlphaGo Zero|AlphaZero|Challenge 1|Challenge 2|Challenge 3|
-|-----|-----|-----|-----|-----|-----|
-|Worker|self, opt, eval|self, opt|self, opt, eval|self, opt|self, opt|
-|use_newest_next_generation_model|FALSE|TRUE|FALSE|TRUE|TRUE|
-|simulation_num_per_move|1600|800|?|400|100|
-|save_policy_of_tau_1|FALSE(maybe)|FALSE(maybe)|FALSE|TRUE|TRUE|
-|c_puct|5(maybe)|5(maybe)|1~3|1|1|
-|virtual_loss|3(maybe)|3(maybe)|3|3 -> 30|10 -> 3|
-|dirichlet_alpha|　|　|　|0.5|0.5|
-|max number of games in training data|　|　|200 * 50|2000 * 5 -> 300 * 5|60 * 5 -> 100 * 5|
-|change_tau_turn|30|　|10|10|3|
-|dirichlet_noise_only_for_legal_moves|?|?|FALSE|FALSE|TRUE|
+|-|AlphaGo Zero|AlphaZero|Challenge 1|Challenge 2|Challenge 3|Challenge 4|
+|-----|-----|-----|-----|-----|-----|-----|
+|Worker|self, opt, eval|self, opt|self, opt, eval|self, opt|self, opt|self, opt|
+|use_newest_next_generation_model|FALSE|TRUE|FALSE|TRUE|TRUE|TRUE|
+|simulation_num_per_move|1600|800|?|400|100|100|
+|save_policy_of_tau_1|FALSE(maybe)|FALSE(maybe)|FALSE|TRUE|TRUE|TRUE|
+|c_puct|5(maybe)|5(maybe)|1~3|1|1|1|
+|virtual_loss|3(maybe)|3(maybe)|3|3 -> 30|10 -> 3|3|
+|dirichlet_alpha|　|　|　|0.5|0.5|0.5|
+|max number of games in training data|　|　|200 * 50|2000 * 5 -> 300 * 5|60 * 5 -> 100 * 5|300 * 5|
+|change_tau_turn|30|　|10|10|3|3|
+|dirichlet_noise_only_for_legal_moves|?|?|FALSE|FALSE|TRUE|TRUE|
 
 ### Challenge 1
 It became strong to a certain extent, but it took time to grow.
@@ -351,6 +351,16 @@ Dirichlet noise to the root node in MCTS is applied only to legal moves.
 
 * 2018/01/12: chnage max_file_num from 60 to 100, because training data size was less then 100,000.
 * 2017/01/12: it seems that too small max_file_num makes large bias training data, and leads to early false positive resign.
+* 2017/01/13: give up challenge.
+
+Learning rate is set 0.0001 after 50000 step, it seems too early.
+
+<img src="doc/img/tensorboard1.png" width="25%"> 
+
+### Challenge 4
+
+Trying small simulation_num_per_move.
+
 
 Challenge 1(AlphaGo Method)
 ------------
@@ -477,4 +487,13 @@ Challenge 3 (AlphaZero Method)
 |date|note|
 |:---:|---|
 |2017/01/12|start|
+|2017/01/13|give up|
+
+Challenge 4 (AlphaZero Method)
+------------
+
+|date|note|
+|:---:|---|
+|2017/01/13|start|
+
 
