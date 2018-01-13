@@ -15,6 +15,7 @@ class Config:
         self.opts = Options()
         self.resource = ResourceConfig()
         self.gui = GuiConfig()
+        self.nboard = NBoardConfig()
 
         if config_type == "mini":
             import reversi_zero.configs.mini as c
@@ -94,3 +95,10 @@ class PlayWithHumanConfig:
         pc.parallel_search_num = self.parallel_search_num
         pc.resign_threshold = self.resign_threshold
         pc.use_newest_next_generation_model = self.use_newest_next_generation_model
+
+
+class NBoardConfig:
+    def __init__(self):
+        self.my_name = "RAZ"
+        self.read_stdin_timeout = 0.1
+        self.simulation_num_per_depth_about = 10
