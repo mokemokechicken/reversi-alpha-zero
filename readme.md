@@ -500,6 +500,7 @@ Vs NBoard Engine.
 |date|note|
 |:---:|---|
 |2017/01/13|start|
-|2017/01/14|Ethelred Lv4=(0, 1, 0)|
+|2017/01/14|restart because of critical virtual loss [bug #35](https://github.com/mokemokechicken/reversi-alpha-zero/issues/35)|
+
 
 
