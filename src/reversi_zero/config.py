@@ -101,5 +101,5 @@ class NBoardConfig:
     def __init__(self):
         self.my_name = "RAZ"
         self.read_stdin_timeout = 0.1
-        self.simulation_num_per_depth_about = 10
+        self.simulation_num_per_depth_about = 20
         self.hint_callback_per_sim = 10

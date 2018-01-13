@@ -50,6 +50,7 @@ class ReversiPlayer:
 
         self.thinking_history = {}  # for fun
         self.resigned = False
+        self.requested_stop_thinking = False
 
     def action(self, own, enemy, callback_in_mtcs=None):
         """
@@ -92,6 +93,9 @@ class ReversiPlayer:
         self.add_data_to_move_buffer_with_8_symmetries(own, enemy, saved_policy)
         return action
 
+    def stop_thinking(self):
+        self.requested_stop_thinking = True
+
     def add_data_to_move_buffer_with_8_symmetries(self, own, enemy, policy):
         for flip in [False, True]:
             for rot_right in range(4):
@@ -118,6 +122,7 @@ class ReversiPlayer:
     def search_moves(self, own, enemy):
         loop = self.loop
         self.running_simulation_num = 0
+        self.requested_stop_thinking = False
 
         coroutine_list = []
         for it in range(self.play_config.simulation_num_per_move):
@@ -131,6 +136,9 @@ class ReversiPlayer:
         self.running_simulation_num += 1
         root_key = self.counter_key(ReversiEnv().update(own, enemy, Player.black))
         with await self.sem:  # reduce parallel search number
+            if self.requested_stop_thinking:
+                self.running_simulation_num -= 1
+                return None
             env = ReversiEnv().update(own, enemy, Player.black)
             leaf_v = await self.search_my_move(env, is_root_node=True)
             self.running_simulation_num -= 1

@@ -9,11 +9,13 @@ class NonBlockingStreamReader:
         self._queue = Queue()
         self._thread = None
 
-    def start(self):
+    def start(self, push_callback=None):
         def _worker():
             while True:
                 line = self._stream.readline()
                 if line:
+                    if push_callback:
+                        push_callback(line)
                     self._queue.put(line)
                 else:
                     raise RuntimeError("line is empty")

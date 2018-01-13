@@ -15,9 +15,10 @@ from reversi_zero.play_game.common import load_model
 
 logger = getLogger(__name__)
 
-GAME_STATE = namedtuple("GAME_STATE", "black white actions player")
-GO_RESPONSE = namedtuple("GO_RESPONSE", "action eval time")
-HINT_RESPONSE = namedtuple("HINT_RESPONSE", "action value visit")
+GameState = namedtuple("GameState", "black white actions player")
+GoResponse = namedtuple("GoResponse", "action eval time")
+HintResponse = namedtuple("HintResponse", "action value visit")
+
 
 def start(config: Config):
     root_logger = getLogger()
@@ -47,7 +48,7 @@ class NBoardEngine:
 
     def start(self):
         self.running = True
-        self.reader.start()
+        self.reader.start(push_callback=self.push_callback)
         while self.running:
             message = self.reader.readline(self.nc.read_stdin_timeout)
             if message is None:
@@ -55,6 +56,11 @@ class NBoardEngine:
             message = message.strip()
             logger.debug(f"> {message}")
             self.handler.handle_message(message)
+
+    def push_callback(self, message: str):
+        # note: called in another thread
+        if message.startswith("ping"):  # interupt
+            self.stop_thinkng()
 
     def stop(self):
         self.running = False
@@ -65,7 +71,7 @@ class NBoardEngine:
         sys.stdout.flush()
 
     def stop_thinkng(self):
-        pass
+        self.player.stop_thinking()
 
     def set_depth(self, n):
         try:
@@ -78,7 +84,7 @@ class NBoardEngine:
     def reset_state(self):
         self.player = self.create_player()
 
-    def set_game(self, game_state: GAME_STATE):
+    def set_game(self, game_state: GameState):
         self.env.reset()
         self.env.update(game_state.black, game_state.white, game_state.player)
         self.turn_of_nboard = game_state.player
@@ -96,9 +102,9 @@ class NBoardEngine:
         if action is not None:
             self.env.step(action)
 
-    def go(self) -> GO_RESPONSE:
+    def go(self) -> GoResponse:
         if self.env.next_player != self.turn_of_nboard:
-            return GO_RESPONSE(None, 0, 0)
+            return GoResponse(None, 0, 0)
 
         board = self.env.board
         if self.env.next_player == Player.black:
@@ -110,13 +116,12 @@ class NBoardEngine:
         item = self.player.ask_thought_about(*states)
         evaluation = item.values[action]
         time_took = time() - start_time
-        return GO_RESPONSE(action, evaluation, time_took)
+        return GoResponse(action, evaluation, time_took)
 
     def hint(self, n_hint):
         """
 
         :param n_hint:
-        :rtype: list[HINT_RESPONSE]
         """
         board = self.env.board
         if self.env.next_player == Player.black:
@@ -128,8 +133,8 @@ class NBoardEngine:
             hint_list = []
             for action, visit in list(sorted(enumerate(visits), key=lambda x: -x[1]))[:n_hint]:
                 if visit > 0:
-                    hint_list.append(HINT_RESPONSE(action, values[action], visit))
-            self.handler.hint_report(hint_list)
+                    hint_list.append(HintResponse(action, values[action], visit))
+            self.handler.report_hint(hint_list)
 
         callback_info = CallbackInMCTS(self.config.nboard.hint_callback_per_sim, hint_report_callback)
         self.player.action(*states, callback_in_mtcs=callback_info)
@@ -189,7 +194,7 @@ class NBoardProtocolVersion2:
         ggf = parse_ggf(ggf_str)
         black, white, actions = convert_to_bitboard_and_actions(ggf)
         player = Player.black if ggf.BO.color == "*" else Player.white
-        self.engine.set_game(GAME_STATE(black, white, actions, player))
+        self.engine.set_game(GameState(black, white, actions, player))
 
         # if set_game at turn=1~2 is sent, reset engine state.
         if len(actions) <= 1:
@@ -248,7 +253,7 @@ class NBoardProtocolVersion2:
         self.engine.hint(int(n))
         self.tell_status("waiting")
 
-    def hint_report(self, hint_list):
+    def report_hint(self, hint_list):
         for hint in reversed(hint_list):  # there is a rule that the last is best?
             move = convert_action_to_move(hint.action)
             self.engine.reply(f"search {move} {hint.value} 0 {int(hint.visit)}")
