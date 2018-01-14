@@ -16,16 +16,18 @@ CounterKey = namedtuple("CounterKey", "black white next_player")
 QueueItem = namedtuple("QueueItem", "state future")
 HistoryItem = namedtuple("HistoryItem", "action policy values visit enemy_values enemy_visit")
 CallbackInMCTS = namedtuple("CallbackInMCTS", "per_sim callback")
+MCTSInfo = namedtuple("MCTSInfo", "var_n var_w var_p")
 
 logger = getLogger(__name__)
 
 
 class ReversiPlayer:
-    def __init__(self, config: Config, model, play_config=None, enable_resign=True):
+    def __init__(self, config: Config, model, play_config=None, enable_resign=True, mtcs_info=None):
         """
 
         :param config:
         :param reversi_zero.agent.model.ReversiModel model:
+        :param MCTSInfo mtcs_info:
         """
         self.config = config
         self.model = model
@@ -34,9 +36,9 @@ class ReversiPlayer:
         self.api = ReversiModelAPI(self.config, self.model)
 
         # key=(own, enemy, action)
-        self.var_n = defaultdict(lambda: np.zeros((64,)))
-        self.var_w = defaultdict(lambda: np.zeros((64,)))
-        self.var_p = defaultdict(lambda: np.zeros((64,)))
+        mtcs_info = mtcs_info or self.create_mtcs_info()
+        self.var_n, self.var_w, self.var_p = mtcs_info
+
         self.expanded = set()
         self.now_expanding = set()
         self.prediction_queue = Queue(self.play_config.prediction_queue_size)
@@ -50,6 +52,12 @@ class ReversiPlayer:
         self.thinking_history = {}  # for fun
         self.resigned = False
         self.requested_stop_thinking = False
+
+    @staticmethod
+    def create_mtcs_info():
+        return MCTSInfo(defaultdict(lambda: np.zeros((64,))),
+                        defaultdict(lambda: np.zeros((64,))),
+                        defaultdict(lambda: np.zeros((64,))))
 
     def var_q(self, key):
         return self.var_w[key] / (self.var_n[key] + 1e-5)

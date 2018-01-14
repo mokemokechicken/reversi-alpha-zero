@@ -44,27 +44,32 @@ class SelfPlayWorker:
 
         self.buffer = []
         idx = 1
+        mtcs_info = None
 
         while True:
             start_time = time()
-            env = self.start_game(idx)
+            if mtcs_info is None and self.config.play.share_mtcs_info_in_self_play:
+                mtcs_info = ReversiPlayer.create_mtcs_info()
+            env = self.start_game(idx, mtcs_info)
             end_time = time()
             logger.debug(f"play game {idx} time={end_time - start_time} sec, "
                          f"turn={env.turn}:{env.board.number_of_black_and_white}:{env.winner}")
-            if True or (idx % self.config.play_data.nb_game_in_file) == 0:
-                if self.config.play.use_newest_next_generation_model:
-                    reload_newest_next_generation_model_if_changed(self.model, clear_session=True)
-                else:
-                    if reload_best_model_weight_if_changed(self.model, clear_session=True):
-                        self.reset_false_positive_count()
+
+            if self.config.play.use_newest_next_generation_model:
+                model_changed = reload_newest_next_generation_model_if_changed(self.model, clear_session=True)
+            else:
+                model_changed = reload_best_model_weight_if_changed(self.model, clear_session=True)
+
+            if model_changed:
+                mtcs_info = None
 
             idx += 1
 
-    def start_game(self, idx):
+    def start_game(self, idx, mtcs_info):
         self.env.reset()
         enable_resign = self.config.play.disable_resignation_rate <= random()
-        self.black = ReversiPlayer(self.config, self.model, enable_resign=enable_resign)
-        self.white = ReversiPlayer(self.config, self.model, enable_resign=enable_resign)
+        self.black = ReversiPlayer(self.config, self.model, enable_resign=enable_resign, mtcs_info=mtcs_info)
+        self.white = ReversiPlayer(self.config, self.model, enable_resign=enable_resign, mtcs_info=mtcs_info)
         if not enable_resign:
             logger.debug("Resignation is disabled in the next game.")
         observation = self.env.observation  # type: Board
