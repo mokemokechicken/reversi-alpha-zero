@@ -6,7 +6,7 @@ from logging import getLogger, StreamHandler, FileHandler
 from time import time
 
 from reversi_zero.agent.player import ReversiPlayer, CallbackInMCTS
-from reversi_zero.config import Config
+from reversi_zero.config import Config, PlayWithHumanConfig
 from reversi_zero.env.reversi_env import ReversiEnv, Player
 from reversi_zero.lib.ggf import parse_ggf, convert_to_bitboard_and_actions, convert_move_to_action, \
     convert_action_to_move
@@ -21,6 +21,7 @@ HintResponse = namedtuple("HintResponse", "action value visit")
 
 
 def start(config: Config):
+    PlayWithHumanConfig().update_play_config(config.play)
     root_logger = getLogger()
     for h in root_logger.handlers:
         if isinstance(h, StreamHandler) and not isinstance(h, FileHandler):
