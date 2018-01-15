@@ -67,4 +67,5 @@ def reload_newest_next_generation_model_if_changed(model, clear_session=False):
             K.clear_session()
         return model.load(config_path, weight_path)
     else:
-        return logger.debug("The newest model is not changed.")
+        logger.debug("The newest model is not changed.")
+        return False

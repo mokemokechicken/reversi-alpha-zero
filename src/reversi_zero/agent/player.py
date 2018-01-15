@@ -16,16 +16,18 @@ CounterKey = namedtuple("CounterKey", "black white next_player")
 QueueItem = namedtuple("QueueItem", "state future")
 HistoryItem = namedtuple("HistoryItem", "action policy values visit enemy_values enemy_visit")
 CallbackInMCTS = namedtuple("CallbackInMCTS", "per_sim callback")
+MCTSInfo = namedtuple("MCTSInfo", "var_n var_w var_p")
 
 logger = getLogger(__name__)
 
 
 class ReversiPlayer:
-    def __init__(self, config: Config, model, play_config=None, enable_resign=True):
+    def __init__(self, config: Config, model, play_config=None, enable_resign=True, mtcs_info=None):
         """
 
         :param config:
         :param reversi_zero.agent.model.ReversiModel model:
+        :param MCTSInfo mtcs_info:
         """
         self.config = config
         self.model = model
@@ -34,10 +36,9 @@ class ReversiPlayer:
         self.api = ReversiModelAPI(self.config, self.model)
 
         # key=(own, enemy, action)
-        self.var_n = defaultdict(lambda: np.zeros((64,)))
-        self.var_w = defaultdict(lambda: np.zeros((64,)))
-        self.var_q = defaultdict(lambda: np.zeros((64,)))
-        self.var_p = defaultdict(lambda: np.zeros((64,)))
+        mtcs_info = mtcs_info or self.create_mtcs_info()
+        self.var_n, self.var_w, self.var_p = mtcs_info
+
         self.expanded = set()
         self.now_expanding = set()
         self.prediction_queue = Queue(self.play_config.prediction_queue_size)
@@ -51,6 +52,15 @@ class ReversiPlayer:
         self.thinking_history = {}  # for fun
         self.resigned = False
         self.requested_stop_thinking = False
+
+    @staticmethod
+    def create_mtcs_info():
+        return MCTSInfo(defaultdict(lambda: np.zeros((64,))),
+                        defaultdict(lambda: np.zeros((64,))),
+                        defaultdict(lambda: np.zeros((64,))))
+
+    def var_q(self, key):
+        return self.var_w[key] / (self.var_n[key] + 1e-5)
 
     def action(self, own, enemy, callback_in_mtcs=None):
         """
@@ -71,17 +81,17 @@ class ReversiPlayer:
             self.search_moves(own, enemy)
             policy = self.calc_policy(own, enemy)
             action = int(np.random.choice(range(64), p=policy))
-            action_by_value = int(np.argmax(self.var_q[key] + (self.var_n[key] > 0)*100))
+            action_by_value = int(np.argmax(self.var_q(key) + (self.var_n[key] > 0)*100))
             if action == action_by_value or env.turn < self.play_config.change_tau_turn or env.turn <= 1:
                 break
 
         # this is for play_gui, not necessary when training.
         next_key = self.get_next_key(own, enemy, action)
-        self.thinking_history[(own, enemy)] = HistoryItem(action, policy, list(self.var_q[key]), list(self.var_n[key]),
-                                                          list(self.var_q[next_key]), list(self.var_n[next_key]))
+        self.thinking_history[(own, enemy)] = HistoryItem(action, policy, list(self.var_q(key)), list(self.var_n[key]),
+                                                          list(self.var_q(next_key)), list(self.var_n[next_key]))
 
         if self.play_config.resign_threshold is not None and\
-                        np.max(self.var_q[key] - (self.var_n[key] == 0)*10) <= self.play_config.resign_threshold:
+                        np.max(self.var_q(key) - (self.var_n[key] == 0)*10) <= self.play_config.resign_threshold:
             self.resigned = True
             if self.enable_resign:
                 if env.turn >= self.config.play.allowed_resign_turn:
@@ -144,7 +154,7 @@ class ReversiPlayer:
             self.running_simulation_num -= 1
             if self.callback_in_mtcs and self.callback_in_mtcs.per_sim > 0 and \
                     self.running_simulation_num % self.callback_in_mtcs.per_sim == 0:
-                self.callback_in_mtcs.callback(list(self.var_q[root_key]), list(self.var_n[root_key]))
+                self.callback_in_mtcs.callback(list(self.var_q(root_key)), list(self.var_n[root_key]))
             return leaf_v
 
     async def search_my_move(self, env: ReversiEnv, is_root_node=False):
@@ -185,14 +195,12 @@ class ReversiPlayer:
 
         self.var_n[key][action_t] += virtual_loss
         self.var_w[key][action_t] -= virtual_loss_for_w
-        self.var_q[key][action_t] = self.var_w[key][action_t] / self.var_n[key][action_t]
         leaf_v = await self.search_my_move(env)  # next move
 
         # on returning search path
-        # update: N, W, Q
-        n = self.var_n[key][action_t] = self.var_n[key][action_t] - virtual_loss + 1
-        w = self.var_w[key][action_t] = self.var_w[key][action_t] + virtual_loss_for_w + leaf_v
-        self.var_q[key][action_t] = w / n
+        # update: N, W
+        self.var_n[key][action_t] += - virtual_loss + 1
+        self.var_w[key][action_t] += virtual_loss_for_w + leaf_v
         return leaf_v
 
     async def expand_and_evaluate(self, env):
@@ -325,10 +333,10 @@ class ReversiPlayer:
 
         u_ = self.play_config.c_puct * p_ * xx_ / (1 + self.var_n[key])
         if env.next_player == Player.black:
-            v_ = (self.var_q[key] + u_ + 1000) * bit_to_array(legal_moves, 64)
+            v_ = (self.var_q(key) + u_ + 1000) * bit_to_array(legal_moves, 64)
         else:
             # When enemy's selecting action, flip Q-Value.
-            v_ = (-self.var_q[key] + u_ + 1000) * bit_to_array(legal_moves, 64)
+            v_ = (-self.var_q(key) + u_ + 1000) * bit_to_array(legal_moves, 64)
 
         # noinspection PyTypeChecker
         action_t = int(np.argmax(v_))
