@@ -6,12 +6,12 @@ cd $(dirname $0)
 
 usage() {
   echo "Usage $0 <version>"
-  echo "available versions are 2, 3"
+  echo "available versions are 2, 3, 4"
 }
 
 version=$1
 
-if [ 0"$version" -ge 2 -a 0"$version" -le 3 ] ; then
+if [ 0"$version" -ge 2 -a 0"$version" -le 4 ] ; then
   echo "now downloading challenge $version model"
 else
   usage
