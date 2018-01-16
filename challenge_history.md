@@ -183,4 +183,4 @@ Challenge 4 (AlphaZero Method)
 |2017/01/14|restart because of critical virtual loss [bug #35](https://github.com/mokemokechicken/reversi-alpha-zero/issues/35)|
 |2017/01/14|Ethelred LV4(2, 0, 0), Gertrude LV1(3, 2, 0) LV2(1, 3, 0), share MCTS info in self play|
 |2017/01/15|Gertrude LV2(3, 4, 0)|
-|2017/01/16|Gertrude LV2(2, 0, 0)|
+|2017/01/16|Gertrude LV2(3, 0, 0), change learning rate from 0.001 -> 0.01 at step 107740, Gertrude LV3(2, 0, 0)|
