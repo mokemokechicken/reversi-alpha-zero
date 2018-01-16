@@ -47,6 +47,11 @@ class TrainerConfig:
         self.epoch_to_checkpoint = 1
         self.start_total_steps = 0
         self.save_model_steps = 200
+        self.lr_schedules = [
+            (0, 0.01),
+            (100000, 0.001),
+            (200000, 0.0001)
+        ]
 
 
 class ModelConfig:

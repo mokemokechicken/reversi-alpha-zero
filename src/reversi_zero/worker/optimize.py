@@ -50,6 +50,7 @@ class OptimizeWorker:
             tb_callback = TensorBoardStepCallback(
                 log_dir=self.config.resource.tensorboard_log_dir,
                 logging_per_steps=self.config.trainer.logging_per_steps,
+                step=total_steps,
             )
             callbacks.append(tb_callback)
 
@@ -86,14 +87,28 @@ class OptimizeWorker:
         # 400k~600k: 1e-3
         # 600k~: 1e-4
 
-        if total_steps < 100000:
-            lr = 1e-2
-        elif total_steps < 200000:
-            lr = 1e-3
-        else:
-            lr = 1e-4
-        K.set_value(self.optimizer.lr, lr)
-        logger.debug(f"total step={total_steps}, set learning rate to {lr}")
+        lr = self.decide_learning_rate(total_steps)
+        if lr:
+            K.set_value(self.optimizer.lr, lr)
+            logger.debug(f"total step={total_steps}, set learning rate to {lr}")
+
+    def decide_learning_rate(self, total_steps):
+        ret = None
+
+        if os.path.exists(self.config.resource.force_learing_rate_file):
+            try:
+                with open(self.config.resource.force_learing_rate_file, "rt") as f:
+                    ret = float(str(f.read()).strip())
+                    if ret:
+                        logger.debug(f"loaded lr from force learning rate file: {ret}")
+                        return ret
+            except ValueError:
+                pass
+
+        for step, lr in self.config.trainer.lr_schedules:
+            if total_steps >= step:
+                ret = lr
+        return ret
 
     def save_current_model(self):
         rc = self.config.resource

@@ -7,9 +7,9 @@ class TensorBoardStepCallback(Callback):
 
     """
 
-    def __init__(self, log_dir, logging_per_steps=100):
+    def __init__(self, log_dir, logging_per_steps=100, step=0):
         super().__init__()
-        self.step = 0
+        self.step = step
         self.logging_per_steps = logging_per_steps
         self.writer = tf.summary.FileWriter(log_dir)
 

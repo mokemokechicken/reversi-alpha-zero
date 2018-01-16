@@ -53,6 +53,7 @@ class ResourceConfig:
         self.log_dir = os.path.join(self.project_dir, "logs")
         self.main_log_path = os.path.join(self.log_dir, "main.log")
         self.tensorboard_log_dir = os.path.join(self.log_dir, 'tensorboard')
+        self.force_learing_rate_file = os.path.join(self.data_dir, ".force-lr")
 
     def create_directories(self):
         dirs = [self.project_dir, self.data_dir, self.model_dir, self.play_data_dir, self.log_dir,

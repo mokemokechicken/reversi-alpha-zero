@@ -55,6 +55,11 @@ class TrainerConfig:
         self.save_model_steps = 200
         self.use_tensorboard = True
         self.logging_per_steps = 100
+        self.lr_schedules = [
+            (0, 0.01),
+            (300000, 0.001),
+            (600000, 0.0001),
+        ]
 
 
 class ModelConfig:
