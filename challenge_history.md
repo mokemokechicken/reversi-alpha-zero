@@ -16,6 +16,8 @@ About
 |max number of games in training data|　|　|200 * 50|2000 * 5 -> 300 * 5|60 * 5 -> 100 * 5|300 * 5|
 |change_tau_turn|30|　|10|10|3|3|
 |dirichlet_noise_only_for_legal_moves|?|?|FALSE|FALSE|TRUE|TRUE|
+|share_mtcs_info_in_self_play|-|-|FALSE|FALSE|FALSE|TRUE|
+
 
 ### Challenge 1
 It became strong to a certain extent, but it took time to grow.
@@ -183,4 +185,5 @@ Challenge 4 (AlphaZero Method)
 |2017/01/14|restart because of critical virtual loss [bug #35](https://github.com/mokemokechicken/reversi-alpha-zero/issues/35)|
 |2017/01/14|Ethelred LV4(2, 0, 0), Gertrude LV1(3, 2, 0) LV2(1, 3, 0), share MCTS info in self play|
 |2017/01/15|Gertrude LV2(3, 4, 0)|
-|2017/01/16|Gertrude LV2(3, 0, 0), change learning rate from 0.001 -> 0.01 at step 107740, Gertrude LV3(2, 0, 0)|
+|2017/01/16|Gertrude LV2(3, 0, 0), change learning rate from 0.001 -> 0.01 at step 107740|
+|2017/01/16|Gertrude LV3(4, 0, 0), Gertrude LV4(2, 0, 0), Ivan LV2(2, 0, 0), Ivan LV4(2, 0, 0), Keiko LV4(2, 1, 0), Novello LV1(0, 0, 1)|
