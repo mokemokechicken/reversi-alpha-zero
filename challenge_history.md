@@ -176,6 +176,7 @@ Challenge 3 (AlphaZero Method)
 Challenge 4 (AlphaZero Method)
 ------------
 * use `simulation_num_per_move = 400` for evaluation
+  * use [reversi-arena](https://github.com/mokemokechicken/reversi-arena) for evaluation. raz depth=20.
 * (Win, Lose, Draw) 
 * Vs NBoard Engine.
 
@@ -190,4 +191,4 @@ Challenge 4 (AlphaZero Method)
 |2018/01/17|Novello LV1(2, 0, 0), Ntest LV1(2, 0, 0), Ntest LV2(1, 2, 0)|
 |2018/01/18|change learning rate from 0.01 -> 0.001 about step 213000, Ntest LV2(4, 2, 0), LV5(0, 2, 0)|
 |2018/01/19|Ntest LV2(2, 2, 0)|
-|2018/01/20|Ntest LV1(10, 0, 0)|
+|2018/01/20|Ntest LV1(10, 0, 0), LV2(6, 3, 1), LV3(6, 4, 0), LV4(2, 8, 0)|

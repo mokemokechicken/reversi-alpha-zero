@@ -21,7 +21,7 @@ class PlayDataConfig:
 
 class PlayConfig:
     def __init__(self):
-        self.simulation_num_per_move = 100
+        self.simulation_num_per_move = 400
         self.share_mtcs_info_in_self_play = True
         self.thinking_loop = 1
         self.logging_thinking = False
@@ -45,7 +45,7 @@ class PlayConfig:
         self.schedule_of_simulation_num_per_move = [
             (0, 8),
             (300, 100),
-            (5000, 400),
+            (2000, 400),
         ]
 
         # True means evaluating 'AlphaZero' method (disable 'eval' worker).
