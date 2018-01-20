@@ -55,6 +55,7 @@ class ResourceConfig:
         self.tensorboard_log_dir = os.path.join(self.log_dir, 'tensorboard')
         self.force_learing_rate_file = os.path.join(self.data_dir, ".force-lr")
         self.force_simulation_num_file = os.path.join(self.data_dir, ".force-sim")
+        self.self_play_game_idx_file = os.path.join(self.data_dir, ".self-play-game-idx")
 
     def create_directories(self):
         dirs = [self.project_dir, self.data_dir, self.model_dir, self.play_data_dir, self.log_dir,

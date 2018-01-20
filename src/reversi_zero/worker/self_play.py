@@ -43,7 +43,7 @@ class SelfPlayWorker:
             self.model = self.load_model()
 
         self.buffer = []
-        idx = 1
+        idx = self.read_as_int(self.config.resource.self_play_game_idx_file) or 1
         mtcs_info = None
 
         while True:
@@ -67,6 +67,8 @@ class SelfPlayWorker:
                 logger.error(e)
 
             idx += 1
+            with open(self.config.resource.self_play_game_idx_file, "wt") as f:
+                f.write(str(idx))
 
     def start_game(self, idx, mtcs_info):
         self.env.reset()
@@ -170,19 +172,24 @@ class SelfPlayWorker:
         self.reset_false_positive_count()
 
     def decide_simulation_num_per_move(self, idx):
-        ret = self.config.play.simulation_num_per_move
+        ret = self.read_as_int(self.config.resource.force_simulation_num_file)
 
-        if os.path.exists(self.config.resource.force_simulation_num_file):
-            try:
-                with open(self.config.resource.force_simulation_num_file, "rt") as f:
-                    ret = int(str(f.read()).strip())
-                    if ret:
-                        logger.debug(f"loaded simulation num from file: {ret}")
-                        return ret
-            except ValueError:
-                pass
+        if ret:
+            logger.debug(f"loaded simulation num from file: {ret}")
+            return ret
 
         for min_idx, num in self.config.play.schedule_of_simulation_num_per_move:
             if idx >= min_idx:
                 ret = num
         return ret
+
+    def read_as_int(self, filename):
+        if os.path.exists(filename):
+            try:
+                with open(filename, "rt") as f:
+                    ret = int(str(f.read()).strip())
+                    if ret:
+                        return ret
+            except ValueError:
+                pass
+
