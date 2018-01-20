@@ -55,19 +55,24 @@ class SelfPlayWorker:
             logger.debug(f"play game {idx} time={end_time - start_time} sec, "
                          f"turn={env.turn}:{env.board.number_of_black_and_white}:{env.winner}")
 
-            if self.config.play.use_newest_next_generation_model:
-                model_changed = reload_newest_next_generation_model_if_changed(self.model, clear_session=True)
-            else:
-                model_changed = reload_best_model_weight_if_changed(self.model, clear_session=True)
+            try:
+                if self.config.play.use_newest_next_generation_model:
+                    model_changed = reload_newest_next_generation_model_if_changed(self.model, clear_session=True)
+                else:
+                    model_changed = reload_best_model_weight_if_changed(self.model, clear_session=True)
 
-            if model_changed:
-                mtcs_info = None
+                if model_changed:
+                    mtcs_info = None
+            except Exception as e:
+                logger.error(e)
 
             idx += 1
 
     def start_game(self, idx, mtcs_info):
         self.env.reset()
         enable_resign = self.config.play.disable_resignation_rate <= random()
+        self.config.play.simulation_num_per_move = self.decide_simulation_num_per_move(idx)
+        logger.debug(f"simulation_num_per_move = {self.config.play.simulation_num_per_move}")
         self.black = ReversiPlayer(self.config, self.model, enable_resign=enable_resign, mtcs_info=mtcs_info)
         self.white = ReversiPlayer(self.config, self.model, enable_resign=enable_resign, mtcs_info=mtcs_info)
         if not enable_resign:
@@ -163,3 +168,21 @@ class SelfPlayWorker:
             self.config.play.resign_threshold += self.config.play.resign_threshold_delta
         logger.debug(f"update resign_threshold: {old_threshold} -> {self.config.play.resign_threshold}")
         self.reset_false_positive_count()
+
+    def decide_simulation_num_per_move(self, idx):
+        ret = self.config.play.simulation_num_per_move
+
+        if os.path.exists(self.config.resource.force_simulation_num_file):
+            try:
+                with open(self.config.resource.force_simulation_num_file, "rt") as f:
+                    ret = int(str(f.read()).strip())
+                    if ret:
+                        logger.debug(f"loaded simulation num from file: {ret}")
+                        return ret
+            except ValueError:
+                pass
+
+        for min_idx, num in self.config.play.schedule_of_simulation_num_per_move:
+            if idx >= min_idx:
+                ret = num
+        return ret

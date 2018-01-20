@@ -41,6 +41,13 @@ class PlayConfig:
         self.false_positive_threshold = 0.05
         self.resign_threshold_delta = 0.01
 
+        #
+        self.schedule_of_simulation_num_per_move = [
+            (0, 8),
+            (300, 100),
+            (5000, 400),
+        ]
+
         # True means evaluating 'AlphaZero' method (disable 'eval' worker).
         # Please change to False if you want to evaluate 'AlphaGo Zero' method.
         self.use_newest_next_generation_model = True
@@ -57,8 +64,8 @@ class TrainerConfig:
         self.logging_per_steps = 100
         self.lr_schedules = [
             (0, 0.01),
-            (300000, 0.001),
-            (600000, 0.0001),
+            (150000, 0.001),
+            (300000, 0.0001),
         ]
 
 

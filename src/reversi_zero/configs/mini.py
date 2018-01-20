@@ -38,6 +38,10 @@ class PlayConfig:
         self.false_positive_threshold = 0.05
         self.resign_threshold_delta = 0.01
         self.use_newest_next_generation_model = True
+        self.simulation_num_per_move_schedule = [
+            (300, 8),
+            (500, 20),
+        ]
 
 
 class TrainerConfig:
