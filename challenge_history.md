@@ -4,19 +4,19 @@ Challenges
 About
 --------
 
-|-|AlphaGo Zero|AlphaZero|Challenge 1|Challenge 2|Challenge 3|Challenge 4|
-|-----|-----|-----|-----|-----|-----|-----|
-|Worker|self, opt, eval|self, opt|self, opt, eval|self, opt|self, opt|self, opt|
-|use_newest_next_generation_model|FALSE|TRUE|FALSE|TRUE|TRUE|TRUE|
-|simulation_num_per_move|1600|800|?|400|100|100|
-|save_policy_of_tau_1|FALSE(maybe)|FALSE(maybe)|FALSE|TRUE|TRUE|TRUE|
-|c_puct|5(maybe)|5(maybe)|1~3|1|1|1|
-|virtual_loss|3(maybe)|3(maybe)|3|3 -> 30|10 -> 3|3|
-|dirichlet_alpha|　|　|　|0.5|0.5|0.5|
-|max number of games in training data|　|　|200 * 50|2000 * 5 -> 300 * 5|60 * 5 -> 100 * 5|300 * 5|
-|change_tau_turn|30|　|10|10|3|3|
-|dirichlet_noise_only_for_legal_moves|?|?|FALSE|FALSE|TRUE|TRUE|
-|share_mtcs_info_in_self_play|-|-|FALSE|FALSE|FALSE|TRUE|
+|-|AlphaGo Zero|AlphaZero|Challenge 1|Challenge 2|Challenge 3|Challenge 4|Challenge 5|
+|-----|-----|-----|-----|-----|-----|-----|-----|
+|Worker|self, opt, eval|self, opt|self, opt, eval|self, opt|self, opt|self, opt|self, opt|
+|use_newest_next_generation_model|FALSE|TRUE|FALSE|TRUE|TRUE|TRUE|TRUE|
+|simulation_num_per_move|1600|800|?|400|100|100|8->100->400|
+|save_policy_of_tau_1|FALSE(maybe)|FALSE(maybe)|FALSE|TRUE|TRUE|TRUE|TRUE|
+|c_puct|5(maybe)|5(maybe)|1~3|1|1|1|1|
+|virtual_loss|3(maybe)|3(maybe)|3|3 -> 30|10 -> 3|3|3|
+|dirichlet_alpha|　|　|　|0.5|0.5|0.5|0.5|
+|max number of games in training data|　|　|200 * 50|2000 * 5 -> 300 * 5|60 * 5 -> 100 * 5|300 * 5|300 * 5|
+|change_tau_turn|30|　|10|10|3|3|3|
+|dirichlet_noise_only_for_legal_moves|?|?|FALSE|FALSE|TRUE|TRUE|TRUE|
+|share_mtcs_info_in_self_play|-|-|FALSE|FALSE|FALSE|TRUE|TRUE|
 
 
 ### Challenge 1
@@ -29,22 +29,28 @@ Changing "max number of games in training data (max_file_num 2000 -> 300)" made 
 It seems that changing virtual loss from 3 to 30 on the way of training made model collapse some degree.  
 
 ### Challenge 3
-Trying small simulation_num_per_move and max_file_num. 
+Trying small simulation_num_per_move and max_file_num.
 virtual_loss is a little smaller.
 Dirichlet noise to the root node in MCTS is applied only to legal moves.
 
-* 2018/01/12: chnage max_file_num from 60 to 100, because training data size was less then 100,000.
+* 2018/01/12: change max_file_num from 60 to 100, because training data size was less then 100,000.
 * 2017/01/12: it seems that too small max_file_num makes large bias training data, and leads to early false positive resign.
 * 2017/01/13: give up challenge.
 
 Learning rate is set 0.0001 after 50000 step, it seems too early.
 
-<img src="doc/img/tensorboard1.png" width="25%"> 
+<img src="doc/img/tensorboard1.png" width="25%">
 
 ### Challenge 4
 
-Trying small simulation_num_per_move.
+Try small simulation_num_per_move(=100).
+The model became as strong as NTest LV 2~4 in a week.
 
+<img src="doc/img/challange4_loss.png" width="50%">
+
+### Challenge 5
+
+Trying changing simulation_num_per_move from 8 to 400.
 
 Challenge 1(AlphaGo Method)
 ------------
@@ -177,7 +183,7 @@ Challenge 4 (AlphaZero Method)
 ------------
 * use `simulation_num_per_move = 400` for evaluation
   * use [reversi-arena](https://github.com/mokemokechicken/reversi-arena) for evaluation. raz depth=20.
-* (Win, Lose, Draw) 
+* (Win, Lose, Draw)
 * Vs NBoard Engine.
 
 |date|note|
@@ -192,3 +198,12 @@ Challenge 4 (AlphaZero Method)
 |2018/01/18|change learning rate from 0.01 -> 0.001 about step 213000, Ntest LV2(4, 2, 0), LV5(0, 2, 0)|
 |2018/01/19|Ntest LV2(2, 2, 0)|
 |2018/01/20|Ntest LV1(10, 0, 0), LV2(6, 3, 1), LV3(6, 4, 0), LV4(2, 8, 0)|
+
+<img src="doc/img/challange4_loss.png" width="50%">
+
+Challenge 5 (AlphaZero Method)
+------------
+
+|date|note|
+|:---:|---|
+|2018/01/20|start|
