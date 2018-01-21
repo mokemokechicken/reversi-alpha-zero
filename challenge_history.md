@@ -51,6 +51,7 @@ The model became as strong as NTest LV 2~4 in a week.
 ### Challenge 5
 
 Trying changing simulation_num_per_move from 8 to 400.
+Change batch size from 512 to 256.
 
 Challenge 1(AlphaGo Method)
 ------------
@@ -207,3 +208,4 @@ Challenge 5 (AlphaZero Method)
 |date|note|
 |:---:|---|
 |2018/01/20|start|
+|2018/01/21|Ethelred LV4(2, 0, 0), Gertrude LV2(2, 0, 0), LV4(1, 1, 0), Ntest LV1(0, 10, 0)|
