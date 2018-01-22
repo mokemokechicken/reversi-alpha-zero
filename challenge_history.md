@@ -208,4 +208,5 @@ Challenge 5 (AlphaZero Method)
 |date|note|
 |:---:|---|
 |2018/01/20|start|
-|2018/01/21|Ethelred LV4(2, 0, 0), Gertrude LV2(2, 0, 0), LV4(1, 1, 0), Ntest LV1(0, 10, 0)|
+|2018/01/21|Ethelred LV4(2, 0, 0), Gertrude LV2(2, 0, 0), LV4(1, 1, 0), Ntest LV1(1, 19, 0), self-play didn't run about 12 hours|
+|2018/01/22|Ntest LV1(0, 9, 1)|
