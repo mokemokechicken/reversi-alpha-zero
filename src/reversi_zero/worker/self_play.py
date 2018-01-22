@@ -57,14 +57,16 @@ class SelfPlayWorker:
 
             try:
                 if self.config.play.use_newest_next_generation_model:
-                    model_changed = reload_newest_next_generation_model_if_changed(self.model, clear_session=True)
+                    reload_newest_next_generation_model_if_changed(self.model, clear_session=True)
                 else:
-                    model_changed = reload_best_model_weight_if_changed(self.model, clear_session=True)
+                    reload_best_model_weight_if_changed(self.model, clear_session=True)
 
-                if model_changed:
-                    mtcs_info = None
             except Exception as e:
                 logger.error(e)
+
+            if idx % self.config.play.reset_mtcs_info_per_game == 0:
+                logger.debug("reset MTCS info")
+                mtcs_info = None
 
             idx += 1
             with open(self.config.resource.self_play_game_idx_file, "wt") as f:

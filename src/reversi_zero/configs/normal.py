@@ -23,6 +23,7 @@ class PlayConfig:
     def __init__(self):
         self.simulation_num_per_move = 400
         self.share_mtcs_info_in_self_play = True
+        self.reset_mtcs_info_per_game = 10
         self.thinking_loop = 1
         self.logging_thinking = False
         self.c_puct = 1
