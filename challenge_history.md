@@ -186,6 +186,7 @@ Challenge 4 (AlphaZero Method)
   * use [reversi-arena](https://github.com/mokemokechicken/reversi-arena) for evaluation. raz depth=20.
 * (Win, Lose, Draw)
 * Vs NBoard Engine.
+* NTest Lv2~3 is stronger than the iOS App around LV44~
 
 |date|note|
 |:---:|---|
@@ -204,9 +205,15 @@ Challenge 4 (AlphaZero Method)
 
 Challenge 5 (AlphaZero Method)
 ------------
+* RAZ: this model (Reversi Alpha Zero)
+* "RAZ:10" means "RAZ depth 10". depth N means sim_per_move=N*20 
+
+I usually evaluate with RAZ:20.
 
 |date|note|
 |:---:|---|
 |2018/01/20|start|
 |2018/01/21|Ethelred LV4(2, 0, 0), Gertrude LV2(2, 0, 0), LV4(1, 1, 0), Ntest LV1(1, 19, 0), self-play didn't run about 12 hours|
-|2018/01/22|Ntest LV1(0, 9, 1)|
+|2018/01/22|Ntest LV1(9, 30, 1)|
+|2018/01/23|Ntest LV1(12, 16, 2)|
+|2018/01/24|Ntest LV1(13, 6, 1), (evening) RAZ:10 - Ntest LV1 (8, 2, 0). Small depth didn't bring weakness to ntest-lv1.|
