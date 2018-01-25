@@ -263,6 +263,12 @@ So, convenient way to evaluate your model is for example,
 I have little confidence about `hint` protocol as analysis-engine (there is odd behavior), 
 but work in my environment.
 
+Auto Evaluation with other reversi AIs
+----------------
+
+[reversi-arena](https://github.com/mokemokechicken/reversi-arena) is a system for evaluating reversi AIs which implement NBoard Protocol.
+It is useful when playing many games with strong AI like NTest.
+
 
 View Training Log in TensorBoard
 ----------------

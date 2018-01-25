@@ -216,4 +216,5 @@ I usually evaluate with RAZ:20.
 |2018/01/21|Ethelred LV4(2, 0, 0), Gertrude LV2(2, 0, 0), LV4(1, 1, 0), Ntest LV1(1, 19, 0), self-play didn't run about 12 hours|
 |2018/01/22|Ntest LV1(9, 30, 1)|
 |2018/01/23|Ntest LV1(12, 16, 2)|
-|2018/01/24|Ntest LV1(13, 6, 1), (evening) RAZ:10 - Ntest LV1 (8, 2, 0). Small depth didn't bring weakness to ntest-lv1.|
+|2018/01/24|Ntest LV1(13, 6, 1), (evening) RAZ:10 vs Ntest LV1 (8, 2, 0) and Ntest LV2 (3, 7, 0). Small depth didn't bring weakness to ntest-lv1~2.|
+|2018/01/25|Ntest LV1(7, 2, 1), LV2(6, 4, 0)|
