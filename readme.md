@@ -29,7 +29,7 @@ This AlphaGo Zero implementation consists of three worker `self`, `opt` and `eva
 
 For evaluation, you can play reversi with the BestModel.  
 
-* `play_gui` is Play Game vs BestModel using wxPython. 
+* `play_gui` is Play Game vs BestModel using wxPython.
 
 Data
 -----
@@ -38,7 +38,7 @@ Data
 * `data/model/next_generation/*`: next-generation models.
 * `data/play_data/play_*.json`: generated training data.
 * `logs/main.log`: log file.
-  
+
 If you want to train the model from the beginning, delete the above directories.
 
 How to use
@@ -124,7 +124,7 @@ In DeepMind's paper,
 it seems that policy(π) data saved by self-play are distribution in proportion to pow(N, 1/tau).
 After the middle of the game, the tau becomes 0, so the distribution is one-hot.
 
-`PlayDataConfig#save_policy_of_tau_1 = True` means that the saved policy's tau is always 1. 
+`PlayDataConfig#save_policy_of_tau_1 = True` means that the saved policy's tau is always 1.
 
 ## other important hyper-parameters (I think)
 
@@ -142,11 +142,14 @@ If you find a good parameter set, please share in the github issues!
 * `parallel_search_num`: balance parameter(?) of speed and accuracy in MCTS.
   * `prediction_queue_size` should be same or greater than `parallel_search_num`.
 * `dirichlet_alpha`: random parameter in self-play.
+* `dirichlet_noise_only_for_legal_moves`: if true, apply dirichlet noise only for legal moves. I don't know whether the DeepMind setting was true or false.
+* `share_mtcs_info_in_self_play`: extra option. if true, share MCTS tree node information among games in self-play.
+  * `reset_mtcs_info_per_game`: reset timing of shared MCTS information.
 
 Basic Usages
 ------------
 
-For training model, execute `Self-Play`, `Trainer` and `Evaluator`. 
+For training model, execute `Self-Play`, `Trainer` and `Evaluator`.
 
 
 Self-Play
@@ -172,11 +175,11 @@ python src/reversi_zero/run.py opt
 
 When executed, Training will start.
 A base model will be loaded from latest saved next-generation model. If not existed, BestModel is used.
-Trained model will be saved every 2000 steps(mini-batch) after epoch. 
+Trained model will be saved every 2000 steps(mini-batch) after epoch.
 
 ### options
 * `--type mini`: use mini config for testing, (see `src/reversi_zero/configs/mini.py`)
-* `--total-step`: specify total step(mini-batch) numbers. The total step affects learning rate of training. 
+* `--total-step`: specify total step(mini-batch) numbers. The total step affects learning rate of training.
 
 Evaluator
 ---------
@@ -187,7 +190,7 @@ python src/reversi_zero/run.py eval
 
 When executed, Evaluation will start.
 It evaluates BestModel and the latest next-generation model by playing about 200 games.
-If next-generation model wins, it becomes BestModel. 
+If next-generation model wins, it becomes BestModel.
 
 ### options
 * `--type mini`: use mini config for testing, (see `src/reversi_zero/configs/mini.py`)
@@ -227,7 +230,7 @@ After BestModel moves, numbers are displayed on the board.
 Run as NBoard2.0 Engine
 --------------
 
-[NBoard](http://www.orbanova.com/nboard/) is a very good reversi GUI and has strong reversi engines, 
+[NBoard](http://www.orbanova.com/nboard/) is a very good reversi GUI and has strong reversi engines,
 which runs on Windows, Mac, and Linux (JRE required).
 
 <img src="doc/img/nboard.png" width="50%">
@@ -236,7 +239,7 @@ It can add external engines that implement [NBoard Protocol](https://github.com/
 
 ### How to add this model as an external engine to NBoard
 
-* (0) launch NBoard from command line(need environment variables like PATH) 
+* (0) launch NBoard from command line(need environment variables like PATH)
   * ex) `java -jar /Applications/NBoard/nboard-2.0.jar`
 * (1) select menu `Engine -> Select Opponent...`
 * (2) clike button `Add Engine`
@@ -260,7 +263,7 @@ So, convenient way to evaluate your model is for example,
 * start `User plays Black`(or White)
 * You simply choose the best move of analysis-engine.
 
-I have little confidence about `hint` protocol as analysis-engine (there is odd behavior), 
+I have little confidence about `hint` protocol as analysis-engine (there is odd behavior),
 but work in my environment.
 
 Auto Evaluation with other reversi AIs
@@ -279,7 +282,7 @@ View Training Log in TensorBoard
 pip install tensorboard
 ```
 
-### 2. launch tensorboard and access by web browser 
+### 2. launch tensorboard and access by web browser
 
 ```bash
 tensorboard --logdir logs/tensorboard/
