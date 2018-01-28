@@ -57,6 +57,7 @@ class PlayConfig:
 
 class TrainerConfig:
     def __init__(self):
+        self.wait_after_save_model_ratio = 1  # wait after saving model
         self.batch_size = 256  # 2048
         self.min_data_size_to_learn = 100000
         self.epoch_to_checkpoint = 1

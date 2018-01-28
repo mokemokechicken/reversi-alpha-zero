@@ -115,8 +115,11 @@ class SelfPlayWorker:
         files = get_game_data_filenames(self.config.resource)
         if len(files) < self.config.play_data.max_file_num:
             return
-        for i in range(len(files) - self.config.play_data.max_file_num):
-            os.remove(files[i])
+        try:
+            for i in range(len(files) - self.config.play_data.max_file_num):
+                os.remove(files[i])
+        except:
+            pass
 
     def finish_game(self, resign_enabled=True):
         if self.env.winner == Winner.black:

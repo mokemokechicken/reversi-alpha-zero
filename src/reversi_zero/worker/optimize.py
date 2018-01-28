@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from logging import getLogger
-from time import sleep
+from time import sleep, time
 
 import keras.backend as K
 import numpy as np
@@ -42,7 +42,8 @@ class OptimizeWorker:
     def training(self):
         self.compile_model()
         total_steps = self.config.trainer.start_total_steps
-        save_model_callback = PerStepCallback(self.config.trainer.save_model_steps, self.save_current_model)
+        save_model_callback = PerStepCallback(self.config.trainer.save_model_steps, self.save_current_model,
+                                              self.config.trainer.wait_after_save_model_ratio)
         callbacks = [save_model_callback]  # type: list[Callback]
         tb_callback = None  # type: TensorBoardStepCallback
 
@@ -208,13 +209,24 @@ class OptimizeWorker:
 
 
 class PerStepCallback(Callback):
-    def __init__(self, per_step, callback):
+    def __init__(self, per_step, callback, wait_after_save_model_ratio=None):
         super().__init__()
         self.per_step = per_step
         self.step = 0
         self.callback = callback
+        self.wait_after_save_model_ratio = wait_after_save_model_ratio
+        self.last_wait_time = time()
 
     def on_batch_end(self, batch, logs=None):
         self.step += 1
         if self.step % self.per_step == 0:
             self.callback()
+            self.wait()
+
+    def wait(self):
+        if self.wait_after_save_model_ratio:
+            time_spent = time() - self.last_wait_time
+            logger.debug(f"start sleeping {time_spent} seconds")
+            sleep(time_spent * self.wait_after_save_model_ratio)
+            logger.debug(f"finish sleeping")
+            self.last_wait_time = time()
