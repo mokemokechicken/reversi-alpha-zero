@@ -22,18 +22,19 @@ logger = getLogger(__name__)
 
 
 class ReversiPlayer:
-    def __init__(self, config: Config, model, play_config=None, enable_resign=True, mtcs_info=None):
+    def __init__(self, config: Config, model, play_config=None, enable_resign=True, mtcs_info=None, api=None):
         """
 
         :param config:
-        :param reversi_zero.agent.model.ReversiModel model:
+        :param reversi_zero.agent.model.ReversiModel|None model:
         :param MCTSInfo mtcs_info:
+        :parameter ReversiModelAPI api:
         """
         self.config = config
         self.model = model
         self.play_config = play_config or self.config.play
         self.enable_resign = enable_resign
-        self.api = ReversiModelAPI(self.config, self.model)
+        self.api = api or ReversiModelAPI(self.config, self.model)
 
         # key=(own, enemy, action)
         mtcs_info = mtcs_info or self.create_mtcs_info()
@@ -262,9 +263,10 @@ class ReversiPlayer:
                 await asyncio.sleep(self.config.play.prediction_worker_sleep_sec)
                 continue
             item_list = [q.get_nowait() for _ in range(q.qsize())]  # type: list[QueueItem]
-            # logger.debug(f"predicting {len(item_list)} items")
+            #logger.debug(f"predicting {len(item_list)} items")
             data = np.array([x.state for x in item_list])
-            policy_ary, value_ary = self.api.predict(data)
+            policy_ary, value_ary = self.api.predict(data)  # shape=(N, 2, 8, 8)
+            #logger.debug(f"predicted {len(item_list)} items")
             for p, v, item in zip(policy_ary, value_ary, item_list):
                 item.future.set_result((p, v))
 

@@ -1,37 +1,46 @@
 import os
+from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime
 from logging import getLogger
 from random import random
 from time import time
+import  numpy as np
 
+from reversi_zero.agent.api import MultiProcessReversiModelAPIServer
 from reversi_zero.agent.player import ReversiPlayer
 from reversi_zero.config import Config
 from reversi_zero.env.reversi_env import Board, Winner
 from reversi_zero.env.reversi_env import ReversiEnv, Player
 from reversi_zero.lib import tf_util
 from reversi_zero.lib.data_helper import get_game_data_filenames, write_game_data_to_file
-from reversi_zero.lib.model_helpler import load_best_model_weight, save_as_best_model, \
-    reload_best_model_weight_if_changed, reload_newest_next_generation_model_if_changed
 
 logger = getLogger(__name__)
 
 
 def start(config: Config):
     tf_util.set_session_config(per_process_gpu_memory_fraction=0.3)
-    return SelfPlayWorker(config, env=ReversiEnv()).start()
+    api_server = MultiProcessReversiModelAPIServer(config)
+    process_num = config.play_data.multi_process_num
+    api_server.start_serve()
+
+    with ProcessPoolExecutor(max_workers=process_num) as executor:
+        futures = []
+        for i in range(process_num):
+            play_worker = SelfPlayWorker(config, env=ReversiEnv(), api=api_server.get_api_client())
+            futures.append(executor.submit(play_worker.start))
 
 
 class SelfPlayWorker:
-    def __init__(self, config: Config, env=None, model=None):
+    def __init__(self, config: Config, env, api):
         """
 
         :param config:
         :param ReversiEnv|None env:
-        :param reversi_zero.agent.model.ReversiModel|None model:
+        :param ReversiModelAPI|None api:
         """
         self.config = config
-        self.model = model
         self.env = env
+        self.api = api
         self.black = None  # type: ReversiPlayer
         self.white = None  # type: ReversiPlayer
         self.buffer = []
@@ -39,8 +48,8 @@ class SelfPlayWorker:
         self.resign_test_game_count = 0
 
     def start(self):
-        if self.model is None:
-            self.model = self.load_model()
+        logger.debug("SelfPlayWorker#start()")
+        np.random.seed(None)
 
         self.buffer = []
         idx = self.read_as_int(self.config.resource.self_play_game_idx_file) or 1
@@ -55,15 +64,6 @@ class SelfPlayWorker:
             logger.debug(f"play game {idx} time={end_time - start_time} sec, "
                          f"turn={env.turn}:{env.board.number_of_black_and_white}:{env.winner}")
 
-            try:
-                if self.config.play.use_newest_next_generation_model:
-                    reload_newest_next_generation_model_if_changed(self.model, clear_session=True)
-                else:
-                    reload_best_model_weight_if_changed(self.model, clear_session=True)
-
-            except Exception as e:
-                logger.error(e)
-
             if idx % self.config.play.reset_mtcs_info_per_game == 0:
                 logger.debug("reset MTCS info")
                 mtcs_info = None
@@ -77,8 +77,8 @@ class SelfPlayWorker:
         enable_resign = self.config.play.disable_resignation_rate <= random()
         self.config.play.simulation_num_per_move = self.decide_simulation_num_per_move(idx)
         logger.debug(f"simulation_num_per_move = {self.config.play.simulation_num_per_move}")
-        self.black = ReversiPlayer(self.config, self.model, enable_resign=enable_resign, mtcs_info=mtcs_info)
-        self.white = ReversiPlayer(self.config, self.model, enable_resign=enable_resign, mtcs_info=mtcs_info)
+        self.black = self.create_reversi_player(enable_resign=enable_resign, mtcs_info=mtcs_info)
+        self.white = self.create_reversi_player(enable_resign=enable_resign, mtcs_info=mtcs_info)
         if not enable_resign:
             logger.debug("Resignation is disabled in the next game.")
         observation = self.env.observation  # type: Board
@@ -93,6 +93,9 @@ class SelfPlayWorker:
         self.save_play_data(write=idx % self.config.play_data.nb_game_in_file == 0)
         self.remove_play_data()
         return self.env
+
+    def create_reversi_player(self, enable_resign=None, mtcs_info=None):
+        return ReversiPlayer(self.config, None, enable_resign=enable_resign, mtcs_info=mtcs_info, api=self.api)
 
     def save_play_data(self, write=True):
         data = self.black.moves + self.white.moves
@@ -135,21 +138,6 @@ class SelfPlayWorker:
                 self.false_positive_count_of_resign += 1
                 logger.debug("false positive of resignation happened")
             self.check_and_update_resignation_threshold()
-
-    def load_model(self):
-        from reversi_zero.agent.model import ReversiModel
-        model = ReversiModel(self.config)
-        loaded = False
-        if not self.config.opts.new:
-            if self.config.play.use_newest_next_generation_model:
-                loaded = reload_newest_next_generation_model_if_changed(model) or load_best_model_weight(model)
-            else:
-                loaded = load_best_model_weight(model) or reload_newest_next_generation_model_if_changed(model)
-
-        if not loaded:
-            model.build()
-            save_as_best_model(model)
-        return model
 
     def reset_false_positive_count(self):
         self.false_positive_count_of_resign = 0
