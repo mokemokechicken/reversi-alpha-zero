@@ -5,6 +5,8 @@ Reversi reinforcement learning by [AlphaGo Zero](https://deepmind.com/blog/alpha
 
 @mokemokechicken's training hisotry is [Challenge History](challenge_history.md).
 
+If you can share your achievements, I would be grateful if you post them to [Performance Reports](https://github.com/mokemokechicken/reversi-alpha-zero/issues/40).
+
 Environment
 -----------
 
