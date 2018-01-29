@@ -135,6 +135,7 @@ If you find a good parameter set, please share in the github issues!
 ### PlayDataConfig
 
 * `nb_game_in_file,max_file_num`: The max game number of training data is `nb_game_in_file * max_file_num`.
+* `multi_process_num`: Number of process to generate self-play data.
 
 ### PlayConfig, PlayWithHumanConfig
 
@@ -147,6 +148,10 @@ If you find a good parameter set, please share in the github issues!
 * `dirichlet_noise_only_for_legal_moves`: if true, apply dirichlet noise only for legal moves. I don't know whether the DeepMind setting was true or false.
 * `share_mtcs_info_in_self_play`: extra option. if true, share MCTS tree node information among games in self-play.
   * `reset_mtcs_info_per_game`: reset timing of shared MCTS information.
+
+### TrainerConfig
+
+* `wait_after_save_model_ratio`: if greater than 0, optimizer will wait the ratio time to time span of saving model every after saving model. It might be useful if you run `self-play` and `optimize` in one GPU. 
 
 Basic Usages
 ------------

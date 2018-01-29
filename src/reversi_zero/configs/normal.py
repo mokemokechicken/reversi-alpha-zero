@@ -14,8 +14,9 @@ class EvaluateConfig:
 class PlayDataConfig:
     def __init__(self):
         # Max Training Data Size = nb_game_in_file * max_file_num * 8
-        self.nb_game_in_file = 5
-        self.max_file_num = 300
+        self.multi_process_num = 16
+        self.nb_game_in_file = 2
+        self.max_file_num = 800
         self.save_policy_of_tau_1 = True
 
 
@@ -23,7 +24,7 @@ class PlayConfig:
     def __init__(self):
         self.simulation_num_per_move = 400
         self.share_mtcs_info_in_self_play = True
-        self.reset_mtcs_info_per_game = 10
+        self.reset_mtcs_info_per_game = 5
         self.thinking_loop = 1
         self.logging_thinking = False
         self.c_puct = 1
@@ -56,6 +57,7 @@ class PlayConfig:
 
 class TrainerConfig:
     def __init__(self):
+        self.wait_after_save_model_ratio = 1  # wait after saving model
         self.batch_size = 256  # 2048
         self.min_data_size_to_learn = 100000
         self.epoch_to_checkpoint = 1

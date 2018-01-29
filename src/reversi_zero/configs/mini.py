@@ -11,8 +11,9 @@ class EvaluateConfig:
 
 class PlayDataConfig:
     def __init__(self):
-        self.nb_game_in_file = 100
-        self.max_file_num = 10
+        self.multi_process_num = 2
+        self.nb_game_in_file = 5
+        self.max_file_num = 100
         self.save_policy_of_tau_1 = True
 
 
@@ -39,14 +40,15 @@ class PlayConfig:
         self.false_positive_threshold = 0.05
         self.resign_threshold_delta = 0.01
         self.use_newest_next_generation_model = True
-        self.simulation_num_per_move_schedule = [
-            (300, 8),
+        self.schedule_of_simulation_num_per_move = [
+            (0, 8),
             (500, 20),
         ]
 
 
 class TrainerConfig:
     def __init__(self):
+        self.wait_after_save_model_ratio = 1  # wait after saving model
         self.batch_size = 2048
         self.min_data_size_to_learn = 100
         self.epoch_to_checkpoint = 1
