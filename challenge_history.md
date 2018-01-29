@@ -221,3 +221,5 @@ I usually evaluate with RAZ:20.
 |2018/01/26|Ntest LV1(18, 2, 0), LV3(9, 9, 2), LV5(0, 20, 0)|
 |2018/01/27|Ntest LV1(17, 1, 2), LV3(4, 15, 1), LV5(1, 18, 1)|
 |2018/01/28|Ntest LV1(16, 4, 0), LV3(2, 8, 0), LV5(2, 8, 0), change lr from 0.0001 to 0.001 around 800k steps, to 0.0005 around 820k steps, start multiprocess selfplay|
+|2018/01/29|change lr from 0.0005 to 0.001 around 853k steps, Ntest LV1(9, 1, 0), LV3(8, 2, 0), LV5(2, 8, 0)|
+|2018/01/30|Ntest LV1(10, 0, 0), LV3(7, 2, 1), LV5(1, 9, 0)|
