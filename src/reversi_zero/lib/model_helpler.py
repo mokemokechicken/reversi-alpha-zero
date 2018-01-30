@@ -1,5 +1,7 @@
 import os
 from logging import getLogger
+from time import sleep
+
 import keras.backend as K
 
 
@@ -65,7 +67,14 @@ def reload_newest_next_generation_model_if_changed(model, clear_session=False):
         logger.debug(f"Loading weight from {model_dir}")
         if clear_session:
             K.clear_session()
-        return model.load(config_path, weight_path)
+        for _ in range(5):
+            try:
+                return model.load(config_path, weight_path)
+            except Exception as e:
+                logger.warning(f"error in load model: #{e}")
+                sleep(3)
+        raise RuntimeError("Cannot Load Model!")
+
     else:
         logger.debug(f"The newest model is not changed: digest={digest}")
         return False
