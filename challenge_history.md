@@ -224,4 +224,4 @@ I usually evaluate with RAZ:20.
 |2018/01/29|change lr from 0.0005 to 0.001 around 853k steps, Ntest LV1(9, 1, 0), LV3(8, 2, 0), LV5(2, 8, 0)|
 |2018/01/30|Ntest LV1(10, 0, 0), LV3(17, 12, 1), LV5(8, 21, 1)|
 |2018/01/31|Ntest LV3(20, 9, 1), LV5(6, 22, 2)|
-|2018/02/01|Ntest LV3(15, 4, 1), LV5(6, 11, 3)|
+|2018/02/01|Ntest LV3(23, 6, 1), LV5(12, 15, 3), LV7(1, 8, 1)|
