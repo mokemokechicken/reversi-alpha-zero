@@ -40,7 +40,7 @@ class ReversiPlayer:
         mtcs_info = mtcs_info or self.create_mtcs_info()
         self.var_n, self.var_w, self.var_p = mtcs_info
 
-        self.expanded = set()
+        self.expanded = set(self.var_p.keys())
         self.now_expanding = set()
         self.prediction_queue = Queue(self.play_config.prediction_queue_size)
         self.sem = asyncio.Semaphore(self.play_config.parallel_search_num)
