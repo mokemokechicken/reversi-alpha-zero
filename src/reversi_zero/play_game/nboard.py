@@ -26,7 +26,8 @@ def start(config: Config):
     for h in root_logger.handlers:
         if isinstance(h, StreamHandler) and not isinstance(h, FileHandler):
             root_logger.removeHandler(h)
-    return NBoardEngine(config).start()
+    NBoardEngine(config).start()
+    logger.info("finish nboard")
 
 
 class NBoardEngine:
@@ -50,7 +51,7 @@ class NBoardEngine:
     def start(self):
         self.running = True
         self.reader.start(push_callback=self.push_callback)
-        while self.running:
+        while self.running and not self.reader.closed:
             message = self.reader.readline(self.nc.read_stdin_timeout)
             if message is None:
                 continue
