@@ -17,6 +17,7 @@ QueueItem = namedtuple("QueueItem", "state future")
 HistoryItem = namedtuple("HistoryItem", "action policy values visit enemy_values enemy_visit")
 CallbackInMCTS = namedtuple("CallbackInMCTS", "per_sim callback")
 MCTSInfo = namedtuple("MCTSInfo", "var_n var_w var_p")
+ActionWithEvaluation = namedtuple("ActionWithEvaluation", "action n q")
 
 logger = getLogger(__name__)
 
@@ -69,7 +70,23 @@ class ReversiPlayer:
         :param own: BitBoard
         :param enemy:  BitBoard
         :param CallbackInMCTS callback_in_mtcs:
-        :return: action: move pos=0 ~ 63 (0=top left, 7 top right, 63 bottom right)
+        :return action=move pos=0 ~ 63 (0=top left, 7 top right, 63 bottom right)
+        """
+        action_with_eval = self.action_with_evaluation(own, enemy, callback_in_mtcs=callback_in_mtcs)
+        return action_with_eval.action
+
+    def action_with_evaluation(self, own, enemy, callback_in_mtcs=None):
+        """
+
+        :param own: BitBoard
+        :param enemy:  BitBoard
+        :param CallbackInMCTS callback_in_mtcs:
+        :rtype: ActionWithEvaluation
+        :return ActionWithEvaluation(
+                    action=move pos=0 ~ 63 (0=top left, 7 top right, 63 bottom right),
+                    n=N of the action,
+                    q=W/N of the action,
+                )
         """
         env = ReversiEnv().update(own, enemy, Player.black)
         key = self.counter_key(env)
@@ -96,13 +113,13 @@ class ReversiPlayer:
             self.resigned = True
             if self.enable_resign:
                 if env.turn >= self.config.play.allowed_resign_turn:
-                    return None  # means resign
+                    return ActionWithEvaluation(None, 0, 0)  # means resign
                 else:
                     logger.debug(f"Want to resign but disallowed turn {env.turn} < {self.config.play.allowed_resign_turn}")
 
         saved_policy = self.calc_policy_by_tau_1(key) if self.config.play_data.save_policy_of_tau_1 else policy
         self.add_data_to_move_buffer_with_8_symmetries(own, enemy, saved_policy)
-        return action
+        return ActionWithEvaluation(action=action, n=self.var_n[key][action], q=self.var_q(key)[action])
 
     def stop_thinking(self):
         self.requested_stop_thinking = True

@@ -49,6 +49,8 @@ class ResourceConfig:
 
         self.play_data_dir = os.path.join(self.data_dir, "play_data")
         self.play_data_filename_tmpl = "play_%s.json"
+        self.self_play_ggf_data_dir = os.path.join(self.data_dir, "self_play-ggf")
+        self.ggf_filename_tmpl = "self_play-%s.ggf"
 
         self.log_dir = os.path.join(self.project_dir, "logs")
         self.main_log_path = os.path.join(self.log_dir, "main.log")
@@ -60,7 +62,7 @@ class ResourceConfig:
 
     def create_directories(self):
         dirs = [self.project_dir, self.data_dir, self.model_dir, self.play_data_dir, self.log_dir,
-                self.next_generation_model_dir, self.self_play_log_dir]
+                self.next_generation_model_dir, self.self_play_log_dir, self.self_play_ggf_data_dir]
         for d in dirs:
             if not os.path.exists(d):
                 os.makedirs(d)
