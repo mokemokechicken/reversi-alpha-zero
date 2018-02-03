@@ -11,7 +11,7 @@ Player = enum.Enum("Player", "black white")
 Winner = enum.Enum("Winner", "black white draw")
 
 
-def another_player(player):
+def another_player(player: Player):
     return Player.white if player == Player.black else Player.black
 
 

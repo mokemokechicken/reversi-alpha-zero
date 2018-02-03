@@ -9,7 +9,7 @@ from numpy.random import random
 
 from reversi_zero.agent.api import ReversiModelAPI
 from reversi_zero.config import Config
-from reversi_zero.env.reversi_env import ReversiEnv, Player, Winner
+from reversi_zero.env.reversi_env import ReversiEnv, Player, Winner, another_player
 from reversi_zero.lib.bitboard import find_correct_moves, bit_to_array, flip_vertical, rotate90, dirichlet_noise_of_mask
 
 CounterKey = namedtuple("CounterKey", "black white next_player")
@@ -176,6 +176,7 @@ class ReversiPlayer:
                 return 0
 
         key = self.counter_key(env)
+        another_side_key = self.another_side_counter_key(env)
 
         while key in self.now_expanding:
             await asyncio.sleep(self.config.play.wait_for_expanding_sleep_sec)
@@ -202,6 +203,9 @@ class ReversiPlayer:
         # update: N, W
         self.var_n[key][action_t] += - virtual_loss + 1
         self.var_w[key][action_t] += virtual_loss_for_w + leaf_v
+        # update another side info(flip color and player)
+        self.var_n[another_side_key][action_t] += 1
+        self.var_w[another_side_key][action_t] += leaf_v  # must not flip the sign.
         return leaf_v
 
     async def expand_and_evaluate(self, env):
@@ -214,6 +218,8 @@ class ReversiPlayer:
         """
 
         key = self.counter_key(env)
+        another_side_key = self.another_side_counter_key(env)
+
         self.now_expanding.add(key)
 
         black, white = env.board.black, env.board.white
@@ -244,6 +250,7 @@ class ReversiPlayer:
             leaf_p = leaf_p.reshape((64, ))
 
         self.var_p[key] = leaf_p  # P is value for next_player (black or white)
+        self.var_p[another_side_key] = leaf_p
         self.expanded.add(key)
         self.now_expanding.remove(key)
         return float(leaf_v)
@@ -309,6 +316,10 @@ class ReversiPlayer:
     @staticmethod
     def counter_key(env: ReversiEnv):
         return CounterKey(env.board.black, env.board.white, env.next_player.value)
+
+    @staticmethod
+    def another_side_counter_key(env: ReversiEnv):
+        return CounterKey(env.board.white, env.board.black, another_player(env.next_player).value)
 
     def select_action_q_and_u(self, env, is_root_node):
         key = self.counter_key(env)
