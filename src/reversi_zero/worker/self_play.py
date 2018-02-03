@@ -13,6 +13,7 @@ from reversi_zero.env.reversi_env import Board, Winner
 from reversi_zero.env.reversi_env import ReversiEnv, Player
 from reversi_zero.lib import tf_util
 from reversi_zero.lib.data_helper import get_game_data_filenames, write_game_data_to_file
+from reversi_zero.lib.tensorboard_logger import TensorBoardLogger
 
 logger = getLogger(__name__)
 
@@ -26,17 +27,18 @@ def start(config: Config):
     with ProcessPoolExecutor(max_workers=process_num) as executor:
         futures = []
         for i in range(process_num):
-            play_worker = SelfPlayWorker(config, env=ReversiEnv(), api=api_server.get_api_client())
+            play_worker = SelfPlayWorker(config, env=ReversiEnv(), api=api_server.get_api_client(), worker_index=i)
             futures.append(executor.submit(play_worker.start))
 
 
 class SelfPlayWorker:
-    def __init__(self, config: Config, env, api):
+    def __init__(self, config: Config, env, api, worker_index=0):
         """
 
         :param config:
         :param ReversiEnv|None env:
         :param ReversiModelAPI|None api:
+        :param int worker_index:
         """
         self.config = config
         self.env = env
@@ -46,10 +48,14 @@ class SelfPlayWorker:
         self.buffer = []
         self.false_positive_count_of_resign = 0
         self.resign_test_game_count = 0
+        self.worker_index = worker_index
+        self.tensor_board = None  # type: TensorBoardLogger
 
     def start(self):
         logger.debug("SelfPlayWorker#start()")
         np.random.seed(None)
+        self.tensor_board = TensorBoardLogger(self.config.resource.self_play_log_dir,
+                                              filename_suffix=f"-worker{self.worker_index:03d}")
 
         self.buffer = []
         idx = self.read_as_int(self.config.resource.self_play_game_idx_file) or 1
@@ -59,13 +65,25 @@ class SelfPlayWorker:
             start_time = time()
             if mtcs_info is None and self.config.play.share_mtcs_info_in_self_play:
                 mtcs_info = ReversiPlayer.create_mtcs_info()
+
+            # play game
             env = self.start_game(idx, mtcs_info)
+
+            # just log
             end_time = time()
-            logger.debug(f"play game {idx} time={end_time - start_time} sec, "
+            time_spent = end_time - start_time
+            logger.debug(f"play game {idx} time={time_spent} sec, "
                          f"turn={env.turn}:{env.board.number_of_black_and_white}:{env.winner}")
 
+            # log play info to tensor board
+            log_info = {"self/time": time_spent, "self/turn": env.turn}
+            if mtcs_info:
+                log_info["self/mcts_buffer_size"] = len(mtcs_info.var_p)
+            self.tensor_board.log_scaler(log_info, idx)
+
+            # reset MCTS info per X games
             if idx % self.config.play.reset_mtcs_info_per_game == 0:
-                logger.debug("reset MTCS info")
+                logger.debug("reset MCTS info")
                 mtcs_info = None
 
             idx += 1
