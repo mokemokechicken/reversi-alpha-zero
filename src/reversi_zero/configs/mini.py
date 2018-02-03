@@ -12,8 +12,8 @@ class EvaluateConfig:
 class PlayDataConfig:
     def __init__(self):
         self.multi_process_num = 2
-        self.nb_game_in_file = 5
-        self.max_file_num = 100
+        self.nb_game_in_file = 2
+        self.max_file_num = 10
         self.save_policy_of_tau_1 = True
 
 
@@ -35,14 +35,14 @@ class PlayConfig:
         self.prediction_worker_sleep_sec  = 0.00001
         self.wait_for_expanding_sleep_sec = 0.000001
         self.resign_threshold = -0.8
-        self.allowed_resign_turn = 30
+        self.allowed_resign_turn = 10
         self.disable_resignation_rate = 0.1
         self.false_positive_threshold = 0.05
         self.resign_threshold_delta = 0.01
         self.use_newest_next_generation_model = True
         self.schedule_of_simulation_num_per_move = [
             (0, 8),
-            (500, 20),
+            (1000, 20),
         ]
 
 
