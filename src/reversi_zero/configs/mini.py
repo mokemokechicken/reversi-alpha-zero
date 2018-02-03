@@ -15,6 +15,8 @@ class PlayDataConfig:
         self.nb_game_in_file = 2
         self.max_file_num = 10
         self.save_policy_of_tau_1 = True
+        self.enable_ggf_data = True
+        self.nb_game_in_ggf_file = 2
 
 
 class PlayConfig:

@@ -1,6 +1,8 @@
 import re
 from collections import namedtuple
 
+from datetime import datetime
+
 from reversi_zero.lib.util import parse_ggf_board_to_bitboard
 
 GGF = namedtuple("GGF", "BO MOVES")
@@ -44,7 +46,12 @@ def convert_move_to_action(move_str: str):
     return y * 8 + x
 
 
-def convert_action_to_move(action: int):
+def convert_action_to_move(action):
+    """
+
+    :param int|None action:
+    :return:
+    """
     if action is None:
         return "PA"
     y = action // 8
@@ -58,3 +65,36 @@ def convert_to_bitboard_and_actions(ggf: GGF):
     for move in ggf.MOVES:  # type: MOVE
         actions.append(convert_move_to_action(move.pos))
     return black, white, actions
+
+
+def make_ggf_string(black_name=None, white_name=None, dt=None, moves=None, result=None, think_time_sec=60):
+    """
+
+    :param str black_name:
+    :param str white_name:
+    :param datetime|None dt:
+    :param str|None result:
+    :param list[str] moves:
+    :param int think_time_sec:
+    :return:
+    """
+    ggf = '(;GM[Othello]PC[RAZSelf]DT[%(datetime)s]PB[%(black_name)s]PW[%(white_name)s]RE[%(result)s]TI[%(time)s]' \
+          'TY[8]BO[8 ---------------------------O*------*O--------------------------- *]%(move_list)s;)'
+    dt = dt or datetime.utcnow()
+
+    move_list = []
+    for i, move in enumerate(moves or []):
+        if i % 2 == 0:
+            move_list.append(f"B[{move}]")
+        else:
+            move_list.append(f"W[{move}]")
+
+    params = dict(
+        black_name=black_name or "black",
+        white_name=white_name or "white",
+        result=result or '?',
+        datetime=dt.strftime("%Y.%m.%d_%H:%M:%S.%Z"),
+        time=f"{think_time_sec // 60}:{think_time_sec % 60}",
+        move_list="".join(move_list),
+    )
+    return ggf % params

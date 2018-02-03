@@ -11,7 +11,7 @@ Player = enum.Enum("Player", "black white")
 Winner = enum.Enum("Winner", "black white draw")
 
 
-def another_player(player):
+def another_player(player: Player):
     return Player.white if player == Player.black else Player.black
 
 
@@ -132,8 +132,8 @@ class ReversiEnv:
 
 class Board:
     def __init__(self, black=None, white=None, init_type=0):
-        self.black = black or (0b00001000 << 24 | 0b00010000 << 32)
-        self.white = white or (0b00010000 << 24 | 0b00001000 << 32)
+        self.black = black or (0b00010000 << 24 | 0b00001000 << 32)
+        self.white = white or (0b00001000 << 24 | 0b00010000 << 32)
 
         if init_type:
             self.black, self.white = self.white, self.black

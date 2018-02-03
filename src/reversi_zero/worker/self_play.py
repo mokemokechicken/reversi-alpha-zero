@@ -18,6 +18,7 @@ from reversi_zero.env.reversi_env import ReversiEnv, Player
 from reversi_zero.lib import tf_util
 from reversi_zero.lib.data_helper import get_game_data_filenames, write_game_data_to_file
 from reversi_zero.lib.file_util import read_as_int
+from reversi_zero.lib.ggf import convert_action_to_move, make_ggf_string
 from reversi_zero.lib.tensorboard_logger import TensorBoardLogger
 
 logger = getLogger(__name__)
@@ -80,6 +81,8 @@ class SelfPlayWorker:
         self.resign_test_game_count = 0
         self.worker_index = worker_index
         self.tensor_board = None  # type: TensorBoardLogger
+        self.move_history = None  # type: MoveHistory
+        self.move_history_buffer = []  # type: list[MoveHistory]
 
     def start(self):
         try:
@@ -141,16 +144,26 @@ class SelfPlayWorker:
         if not enable_resign:
             logger.debug("Resignation is disabled in the next game.")
         observation = self.env.observation  # type: Board
+        self.move_history = MoveHistory()
+
+        # game loop
         while not self.env.done:
             # logger.debug(f"turn={self.env.turn}")
             if self.env.next_player == Player.black:
-                action = self.black.action(observation.black, observation.white)
+                action = self.black.action_with_evaluation(observation.black, observation.white)
             else:
-                action = self.white.action(observation.white, observation.black)
-            observation, info = self.env.step(action)
+                action = self.white.action_with_evaluation(observation.white, observation.black)
+            self.move_history.move(self.env, action)
+            observation, info = self.env.step(action.action)
+
         self.finish_game(resign_enabled=enable_resign)
         self.save_play_data(write=local_idx % self.config.play_data.nb_game_in_file == 0)
         self.remove_play_data()
+
+        if self.config.play_data.enable_ggf_data:
+            is_write = local_idx % self.config.play_data.nb_game_in_ggf_file == 0
+            is_write |= local_idx <= 5
+            self.save_ggf_data(write=is_write)
         return self.env
 
     def create_reversi_player(self, enable_resign=None, mtcs_info=None):
@@ -169,6 +182,19 @@ class SelfPlayWorker:
         logger.info(f"save play data to {path}")
         write_game_data_to_file(path, self.buffer)
         self.buffer = []
+
+    def save_ggf_data(self, write=True):
+        self.move_history_buffer.append(self.move_history)
+        if not write:
+            return
+
+        rc = self.config.resource
+        game_id = datetime.now().strftime("%Y%m%d-%H%M%S.%f")
+        path = os.path.join(rc.self_play_ggf_data_dir, rc.ggf_filename_tmpl % game_id)
+        with open(path, "wt") as f:
+            for mh in self.move_history_buffer:
+                f.write(mh.make_ggf_string("RAZ", "RAZ") + "\n")
+        self.move_history_buffer = []
 
     def remove_play_data(self):
         files = get_game_data_filenames(self.config.resource)
@@ -234,3 +260,30 @@ class SelfPlayWorker:
             if idx >= min_idx:
                 ret = num
         return ret
+
+
+class MoveHistory:
+    def __init__(self):
+        self.moves = []
+
+    def move(self, env, action):
+        """
+
+        :param ReversiEnv env:
+        :param ActionWithEvaluation action:
+        :return:
+        """
+        if action.action is None:
+            return  # resigned
+
+        if len(self.moves) % 2 == 0:
+            if env.next_player == Player.white:
+                self.moves.append(convert_action_to_move(None))
+        else:
+            if env.next_player == Player.black:
+                self.moves.append(convert_action_to_move(None))
+        move = f"{convert_action_to_move(action.action)}/{action.q*10}/{action.n}"
+        self.moves.append(move)
+
+    def make_ggf_string(self, black_name=None, white_name=None):
+        return make_ggf_string(black_name=black_name, white_name=white_name, moves=self.moves)

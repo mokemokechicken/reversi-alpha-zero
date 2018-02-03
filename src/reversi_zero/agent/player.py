@@ -9,7 +9,7 @@ from numpy.random import random
 
 from reversi_zero.agent.api import ReversiModelAPI
 from reversi_zero.config import Config
-from reversi_zero.env.reversi_env import ReversiEnv, Player, Winner
+from reversi_zero.env.reversi_env import ReversiEnv, Player, Winner, another_player
 from reversi_zero.lib.bitboard import find_correct_moves, bit_to_array, flip_vertical, rotate90, dirichlet_noise_of_mask
 
 CounterKey = namedtuple("CounterKey", "black white next_player")
@@ -17,6 +17,7 @@ QueueItem = namedtuple("QueueItem", "state future")
 HistoryItem = namedtuple("HistoryItem", "action policy values visit enemy_values enemy_visit")
 CallbackInMCTS = namedtuple("CallbackInMCTS", "per_sim callback")
 MCTSInfo = namedtuple("MCTSInfo", "var_n var_w var_p")
+ActionWithEvaluation = namedtuple("ActionWithEvaluation", "action n q")
 
 logger = getLogger(__name__)
 
@@ -69,7 +70,23 @@ class ReversiPlayer:
         :param own: BitBoard
         :param enemy:  BitBoard
         :param CallbackInMCTS callback_in_mtcs:
-        :return: action: move pos=0 ~ 63 (0=top left, 7 top right, 63 bottom right)
+        :return action=move pos=0 ~ 63 (0=top left, 7 top right, 63 bottom right)
+        """
+        action_with_eval = self.action_with_evaluation(own, enemy, callback_in_mtcs=callback_in_mtcs)
+        return action_with_eval.action
+
+    def action_with_evaluation(self, own, enemy, callback_in_mtcs=None):
+        """
+
+        :param own: BitBoard
+        :param enemy:  BitBoard
+        :param CallbackInMCTS callback_in_mtcs:
+        :rtype: ActionWithEvaluation
+        :return ActionWithEvaluation(
+                    action=move pos=0 ~ 63 (0=top left, 7 top right, 63 bottom right),
+                    n=N of the action,
+                    q=W/N of the action,
+                )
         """
         env = ReversiEnv().update(own, enemy, Player.black)
         key = self.counter_key(env)
@@ -79,7 +96,11 @@ class ReversiPlayer:
             if tl > 0 and self.play_config.logging_thinking:
                 logger.debug(f"continue thinking: policy move=({action % 8}, {action // 8}), "
                              f"value move=({action_by_value % 8}, {action_by_value // 8})")
-            self.search_moves(own, enemy)
+            if env.turn > 0:
+                self.search_moves(own, enemy)
+            else:
+                self.bypass_first_move(key)
+
             policy = self.calc_policy(own, enemy)
             action = int(np.random.choice(range(64), p=policy))
             action_by_value = int(np.argmax(self.var_q(key) + (self.var_n[key] > 0)*100))
@@ -96,13 +117,20 @@ class ReversiPlayer:
             self.resigned = True
             if self.enable_resign:
                 if env.turn >= self.config.play.allowed_resign_turn:
-                    return None  # means resign
+                    return ActionWithEvaluation(None, 0, 0)  # means resign
                 else:
                     logger.debug(f"Want to resign but disallowed turn {env.turn} < {self.config.play.allowed_resign_turn}")
 
         saved_policy = self.calc_policy_by_tau_1(key) if self.config.play_data.save_policy_of_tau_1 else policy
         self.add_data_to_move_buffer_with_8_symmetries(own, enemy, saved_policy)
-        return action
+        return ActionWithEvaluation(action=action, n=self.var_n[key][action], q=self.var_q(key)[action])
+
+    def bypass_first_move(self, key):
+        legal_array = bit_to_array(find_correct_moves(key.black, key.white), 64)
+        action = np.argmax(legal_array)
+        self.var_n[key][action] = 1
+        self.var_w[key][action] = 0
+        self.var_p[key] = legal_array / np.sum(legal_array)
 
     def stop_thinking(self):
         self.requested_stop_thinking = True
@@ -176,6 +204,7 @@ class ReversiPlayer:
                 return 0
 
         key = self.counter_key(env)
+        another_side_key = self.another_side_counter_key(env)
 
         while key in self.now_expanding:
             await asyncio.sleep(self.config.play.wait_for_expanding_sleep_sec)
@@ -202,6 +231,9 @@ class ReversiPlayer:
         # update: N, W
         self.var_n[key][action_t] += - virtual_loss + 1
         self.var_w[key][action_t] += virtual_loss_for_w + leaf_v
+        # update another side info(flip color and player)
+        self.var_n[another_side_key][action_t] += 1
+        self.var_w[another_side_key][action_t] -= leaf_v  # must flip the sign.
         return leaf_v
 
     async def expand_and_evaluate(self, env):
@@ -214,6 +246,8 @@ class ReversiPlayer:
         """
 
         key = self.counter_key(env)
+        another_side_key = self.another_side_counter_key(env)
+
         self.now_expanding.add(key)
 
         black, white = env.board.black, env.board.white
@@ -244,6 +278,7 @@ class ReversiPlayer:
             leaf_p = leaf_p.reshape((64, ))
 
         self.var_p[key] = leaf_p  # P is value for next_player (black or white)
+        self.var_p[another_side_key] = leaf_p
         self.expanded.add(key)
         self.now_expanding.remove(key)
         return float(leaf_v)
@@ -309,6 +344,10 @@ class ReversiPlayer:
     @staticmethod
     def counter_key(env: ReversiEnv):
         return CounterKey(env.board.black, env.board.white, env.next_player.value)
+
+    @staticmethod
+    def another_side_counter_key(env: ReversiEnv):
+        return CounterKey(env.board.white, env.board.black, another_player(env.next_player).value)
 
     def select_action_q_and_u(self, env, is_root_node):
         key = self.counter_key(env)
