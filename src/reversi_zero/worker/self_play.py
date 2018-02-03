@@ -4,7 +4,11 @@ from datetime import datetime
 from logging import getLogger
 from random import random
 from time import time
-import  numpy as np
+from traceback import print_stack
+
+import numpy as np
+from multiprocessing import Manager, Lock
+
 
 from reversi_zero.agent.api import MultiProcessReversiModelAPIServer
 from reversi_zero.agent.player import ReversiPlayer
@@ -13,6 +17,7 @@ from reversi_zero.env.reversi_env import Board, Winner
 from reversi_zero.env.reversi_env import ReversiEnv, Player
 from reversi_zero.lib import tf_util
 from reversi_zero.lib.data_helper import get_game_data_filenames, write_game_data_to_file
+from reversi_zero.lib.file_util import read_as_int
 from reversi_zero.lib.tensorboard_logger import TensorBoardLogger
 
 logger = getLogger(__name__)
@@ -24,25 +29,50 @@ def start(config: Config):
     process_num = config.play_data.multi_process_num
     api_server.start_serve()
 
-    with ProcessPoolExecutor(max_workers=process_num) as executor:
-        futures = []
-        for i in range(process_num):
-            play_worker = SelfPlayWorker(config, env=ReversiEnv(), api=api_server.get_api_client(), worker_index=i)
-            futures.append(executor.submit(play_worker.start))
+    with Manager() as manager:
+        shared_var = SharedVar(manager, game_idx=read_as_int(config.resource.self_play_game_idx_file) or 0)
+        with ProcessPoolExecutor(max_workers=process_num) as executor:
+            futures = []
+            for i in range(process_num):
+                play_worker = SelfPlayWorker(config, env=ReversiEnv(), api=api_server.get_api_client(),
+                                             shared_var=shared_var, worker_index=i)
+                futures.append(executor.submit(play_worker.start))
+
+
+class SharedVar:
+    def __init__(self, manager, game_idx: int):
+        """
+
+        :param Manager manager:
+        :param int game_idx:
+        """
+        self._lock = manager.Lock()
+        self._game_idx = manager.Value('i', game_idx)  # type: multiprocessing.managers.ValueProxy
+
+    @property
+    def game_idx(self):
+        return self._game_idx.value
+
+    def incr_game_idx(self, n=1):
+        with self._lock:
+            self._game_idx.value += n
+            return self._game_idx.value
 
 
 class SelfPlayWorker:
-    def __init__(self, config: Config, env, api, worker_index=0):
+    def __init__(self, config: Config, env, api, shared_var, worker_index=0):
         """
 
         :param config:
         :param ReversiEnv|None env:
         :param ReversiModelAPI|None api:
+        :param SharedVar shared_var:
         :param int worker_index:
         """
         self.config = config
         self.env = env
         self.api = api
+        self.shared_var = shared_var
         self.black = None  # type: ReversiPlayer
         self.white = None  # type: ReversiPlayer
         self.buffer = []
@@ -52,48 +82,59 @@ class SelfPlayWorker:
         self.tensor_board = None  # type: TensorBoardLogger
 
     def start(self):
+        try:
+            self._start()
+        except Exception as e:
+            print(repr(e))
+            print_stack()
+
+    def _start(self):
         logger.debug("SelfPlayWorker#start()")
         np.random.seed(None)
-        self.tensor_board = TensorBoardLogger(self.config.resource.self_play_log_dir,
-                                              filename_suffix=f"-worker{self.worker_index:03d}")
+        worker_name = f"worker{self.worker_index:03d}"
+        self.tensor_board = TensorBoardLogger(os.path.join(self.config.resource.self_play_log_dir, worker_name))
 
         self.buffer = []
-        idx = self.read_as_int(self.config.resource.self_play_game_idx_file) or 1
         mtcs_info = None
+        local_idx = 0
 
         while True:
+            local_idx += 1
+            game_idx = self.shared_var.game_idx
+
             start_time = time()
             if mtcs_info is None and self.config.play.share_mtcs_info_in_self_play:
                 mtcs_info = ReversiPlayer.create_mtcs_info()
 
             # play game
-            env = self.start_game(idx, mtcs_info)
+            env = self.start_game(local_idx, game_idx, mtcs_info)
 
+            game_idx = self.shared_var.incr_game_idx()
             # just log
             end_time = time()
             time_spent = end_time - start_time
-            logger.debug(f"play game {idx} time={time_spent} sec, "
+            logger.debug(f"play game {game_idx} time={time_spent} sec, "
                          f"turn={env.turn}:{env.board.number_of_black_and_white}:{env.winner}")
 
             # log play info to tensor board
-            log_info = {"self/time": time_spent, "self/turn": env.turn}
+            prefix = "self"
+            log_info = {f"{prefix}/time": time_spent, f"{prefix}/turn": env.turn}
             if mtcs_info:
-                log_info["self/mcts_buffer_size"] = len(mtcs_info.var_p)
-            self.tensor_board.log_scaler(log_info, idx)
+                log_info[f"{prefix}/mcts_buffer_size"] = len(mtcs_info.var_p)
+            self.tensor_board.log_scaler(log_info, game_idx)
 
             # reset MCTS info per X games
-            if idx % self.config.play.reset_mtcs_info_per_game == 0:
+            if self.config.play.reset_mtcs_info_per_game and local_idx % self.config.play.reset_mtcs_info_per_game == 0:
                 logger.debug("reset MCTS info")
                 mtcs_info = None
 
-            idx += 1
             with open(self.config.resource.self_play_game_idx_file, "wt") as f:
-                f.write(str(idx))
+                f.write(str(game_idx))
 
-    def start_game(self, idx, mtcs_info):
+    def start_game(self, local_idx, last_game_idx, mtcs_info):
         self.env.reset()
         enable_resign = self.config.play.disable_resignation_rate <= random()
-        self.config.play.simulation_num_per_move = self.decide_simulation_num_per_move(idx)
+        self.config.play.simulation_num_per_move = self.decide_simulation_num_per_move(last_game_idx)
         logger.debug(f"simulation_num_per_move = {self.config.play.simulation_num_per_move}")
         self.black = self.create_reversi_player(enable_resign=enable_resign, mtcs_info=mtcs_info)
         self.white = self.create_reversi_player(enable_resign=enable_resign, mtcs_info=mtcs_info)
@@ -108,7 +149,7 @@ class SelfPlayWorker:
                 action = self.white.action(observation.white, observation.black)
             observation, info = self.env.step(action)
         self.finish_game(resign_enabled=enable_resign)
-        self.save_play_data(write=idx % self.config.play_data.nb_game_in_file == 0)
+        self.save_play_data(write=local_idx % self.config.play_data.nb_game_in_file == 0)
         self.remove_play_data()
         return self.env
 
@@ -183,7 +224,7 @@ class SelfPlayWorker:
         self.reset_false_positive_count()
 
     def decide_simulation_num_per_move(self, idx):
-        ret = self.read_as_int(self.config.resource.force_simulation_num_file)
+        ret = read_as_int(self.config.resource.force_simulation_num_file)
 
         if ret:
             logger.debug(f"loaded simulation num from file: {ret}")
@@ -193,14 +234,3 @@ class SelfPlayWorker:
             if idx >= min_idx:
                 ret = num
         return ret
-
-    def read_as_int(self, filename):
-        if os.path.exists(filename):
-            try:
-                with open(filename, "rt") as f:
-                    ret = int(str(f.read()).strip())
-                    if ret:
-                        return ret
-            except ValueError:
-                pass
-
