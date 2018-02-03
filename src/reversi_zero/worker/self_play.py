@@ -162,7 +162,7 @@ class SelfPlayWorker:
 
         if self.config.play_data.enable_ggf_data:
             is_write = local_idx % self.config.play_data.nb_game_in_ggf_file == 0
-            is_write |= local_idx == 5
+            is_write |= local_idx <= 5
             self.save_ggf_data(write=is_write)
         return self.env
 
@@ -194,6 +194,7 @@ class SelfPlayWorker:
         with open(path, "wt") as f:
             for mh in self.move_history_buffer:
                 f.write(mh.make_ggf_string("RAZ", "RAZ") + "\n")
+        self.move_history_buffer = []
 
     def remove_play_data(self):
         files = get_game_data_filenames(self.config.resource)

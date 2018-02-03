@@ -96,7 +96,11 @@ class ReversiPlayer:
             if tl > 0 and self.play_config.logging_thinking:
                 logger.debug(f"continue thinking: policy move=({action % 8}, {action // 8}), "
                              f"value move=({action_by_value % 8}, {action_by_value // 8})")
-            self.search_moves(own, enemy)
+            if env.turn > 0:
+                self.search_moves(own, enemy)
+            else:
+                self.bypass_first_move(key)
+
             policy = self.calc_policy(own, enemy)
             action = int(np.random.choice(range(64), p=policy))
             action_by_value = int(np.argmax(self.var_q(key) + (self.var_n[key] > 0)*100))
@@ -120,6 +124,13 @@ class ReversiPlayer:
         saved_policy = self.calc_policy_by_tau_1(key) if self.config.play_data.save_policy_of_tau_1 else policy
         self.add_data_to_move_buffer_with_8_symmetries(own, enemy, saved_policy)
         return ActionWithEvaluation(action=action, n=self.var_n[key][action], q=self.var_q(key)[action])
+
+    def bypass_first_move(self, key):
+        legal_array = bit_to_array(find_correct_moves(key.black, key.white), 64)
+        action = np.argmax(legal_array)
+        self.var_n[key][action] = 1
+        self.var_w[key][action] = 0
+        self.var_p[key] = legal_array / np.sum(legal_array)
 
     def stop_thinking(self):
         self.requested_stop_thinking = True
@@ -222,7 +233,7 @@ class ReversiPlayer:
         self.var_w[key][action_t] += virtual_loss_for_w + leaf_v
         # update another side info(flip color and player)
         self.var_n[another_side_key][action_t] += 1
-        self.var_w[another_side_key][action_t] += leaf_v  # must not flip the sign.
+        self.var_w[another_side_key][action_t] -= leaf_v  # must flip the sign.
         return leaf_v
 
     async def expand_and_evaluate(self, env):
