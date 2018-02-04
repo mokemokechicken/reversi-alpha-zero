@@ -370,7 +370,11 @@ class ReversiPlayer:
         # re-normalize in legal moves
         p_ = p_ * bit_to_array(legal_moves, 64)
         if np.sum(p_) > 0:
-            p_ = p_ / np.sum(p_)
+            # decay policy gradually in the end phase
+            _pc = self.config.play
+            temperature = min(np.exp(1-np.power(env.turn/_pc.policy_decay_turn, _pc.policy_decay_power)), 1)
+            # normalize and decay policy
+            p_ = self.normalize(p_, temperature)
 
         u_ = self.play_config.c_puct * p_ * xx_ / (1 + self.var_n[key])
         if env.next_player == Player.black:
@@ -382,3 +386,8 @@ class ReversiPlayer:
         # noinspection PyTypeChecker
         action_t = int(np.argmax(v_))
         return action_t
+
+    @staticmethod
+    def normalize(p, t=1):
+        pp = np.power(p, t)
+        return pp / np.sum(pp)
