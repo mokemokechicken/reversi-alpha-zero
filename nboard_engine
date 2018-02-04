@@ -1,5 +1,5 @@
 #!/bin/sh
 
 cd $(dirname $0)
-exec python src/reversi_zero/run.py nboard
+exec python src/reversi_zero/run.py nboard $@
 

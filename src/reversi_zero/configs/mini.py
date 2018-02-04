@@ -24,8 +24,9 @@ class PlayConfig:
         self.simulation_num_per_move = 10
         self.share_mtcs_info_in_self_play = True
         self.reset_mtcs_info_per_game = 10
-        self.thinking_loop = 1
-        self.logging_thinking = False
+        self.thinking_loop = 2
+        self.required_visit_to_decide_action = 40
+        self.start_rethinking_turn = 10
         self.c_puct = 5
         self.noise_eps = 0.25
         self.dirichlet_alpha = 0.5
