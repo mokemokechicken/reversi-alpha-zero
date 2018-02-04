@@ -27,7 +27,7 @@ class PlayConfig:
         self.simulation_num_per_move = 50
         self.share_mtcs_info_in_self_play = True
         self.reset_mtcs_info_per_game = 5
-        self.thinking_loop = 30  # about: (required_visit_to_decide_action * 5 / simulation_num_per_move) ~ 30
+        self.thinking_loop = 10
         self.required_visit_to_decide_action = 400
         self.start_rethinking_turn = 8
         self.c_puct = 1
@@ -51,8 +51,8 @@ class PlayConfig:
         #
         self.schedule_of_simulation_num_per_move = [
             (0, 8),
-            (300, 100),
-            (2000, 400),
+            (300, 50),
+            (2000, 200),
         ]
 
         # True means evaluating 'AlphaZero' method (disable 'eval' worker).
