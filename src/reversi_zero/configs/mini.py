@@ -42,6 +42,8 @@ class PlayConfig:
         self.false_positive_threshold = 0.05
         self.resign_threshold_delta = 0.01
         self.use_newest_next_generation_model = True
+        self.policy_decay_turn = 30
+        self.policy_decay_power = 2
         self.schedule_of_simulation_num_per_move = [
             (0, 8),
             (1000, 20),
