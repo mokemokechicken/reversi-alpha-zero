@@ -91,11 +91,9 @@ class ReversiPlayer:
         env = ReversiEnv().update(own, enemy, Player.black)
         key = self.counter_key(env)
         self.callback_in_mtcs = callback_in_mtcs
+        pc = self.play_config
 
         for tl in range(self.play_config.thinking_loop):
-            if tl > 0 and self.play_config.logging_thinking:
-                logger.debug(f"continue thinking: policy move=({action % 8}, {action // 8}), "
-                             f"value move=({action_by_value % 8}, {action_by_value // 8})")
             if env.turn > 0:
                 self.search_moves(own, enemy)
             else:
@@ -104,7 +102,10 @@ class ReversiPlayer:
             policy = self.calc_policy(own, enemy)
             action = int(np.random.choice(range(64), p=policy))
             action_by_value = int(np.argmax(self.var_q(key) + (self.var_n[key] > 0)*100))
-            if action == action_by_value or env.turn < self.play_config.change_tau_turn or env.turn <= 1:
+            value_diff = self.var_q(key)[action] - self.var_q(key)[action_by_value]
+
+            if env.turn <= pc.start_rethinking_turn or self.requested_stop_thinking or \
+                    (value_diff > -0.01 and self.var_n[key][action] >= pc.required_visit_to_decide_action):
                 break
 
         # this is for play_gui, not necessary when training.

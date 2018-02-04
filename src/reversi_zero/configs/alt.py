@@ -24,11 +24,12 @@ class PlayDataConfig:
 
 class PlayConfig:
     def __init__(self):
-        self.simulation_num_per_move = 400
+        self.simulation_num_per_move = 50
         self.share_mtcs_info_in_self_play = True
         self.reset_mtcs_info_per_game = 5
-        self.thinking_loop = 1
-        self.logging_thinking = False
+        self.thinking_loop = 30  # about: (required_visit_to_decide_action * 5 / simulation_num_per_move) ~ 30
+        self.required_visit_to_decide_action = 400
+        self.start_rethinking_turn = 8
         self.c_puct = 1
         self.noise_eps = 0.25
         self.dirichlet_alpha = 0.5
