@@ -21,6 +21,8 @@ class Config:
             import reversi_zero.configs.mini as c
         elif config_type == "normal":
             import reversi_zero.configs.normal as c
+        elif config_type == "alt":
+            import reversi_zero.configs.alt as c
         else:
             raise RuntimeError(f"unknown config_type: {config_type}")
         self.model = c.ModelConfig()
