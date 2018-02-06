@@ -229,3 +229,4 @@ I usually evaluate with RAZ:20. (win, lose, draw).
 |2018/02/03|Ntest LV3(10, 0, 0), LV5(5, 4, 1), LV7(1, 8, 1), increase sharing MCTS info among games|
 |2018/02/04|Ntest LV3(10, 0, 0), LV5(12, 6, 2), LV7(6, 12, 2), LV9(3, 7, 0), decay policy, change the exit logic of sim loop|
 |2018/02/05|Ntest LV5(10, 8, 2), LV7(6, 13, 1), LV9(9, 11, 0)|
+|2018/02/06|Ntest LV5(8, 2, 0), LV7(7, 3, 0), LV9(2, 8, 0)|
