@@ -79,7 +79,6 @@ class GuiConfig:
 
 class PlayWithHumanConfig:
     def __init__(self):
-        self.simulation_num_per_move = 200
         self.parallel_search_num = 8
         self.noise_eps = 0
         self.change_tau_turn = 0
@@ -92,7 +91,6 @@ class PlayWithHumanConfig:
         :param reversi_zero.configs.normal.PlayConfig pc:
         :return:
         """
-        pc.simulation_num_per_move = self.simulation_num_per_move
         pc.noise_eps = self.noise_eps
         pc.change_tau_turn = self.change_tau_turn
         pc.parallel_search_num = self.parallel_search_num
