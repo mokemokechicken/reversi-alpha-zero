@@ -230,6 +230,7 @@ I usually evaluate with RAZ:20. (win, lose, draw).
 |2018/02/04|Ntest LV3(10, 0, 0), LV5(12, 6, 2), LV7(6, 12, 2), LV9(3, 7, 0), decay policy, change the exit logic of sim loop|
 |2018/02/05|Ntest LV5(10, 8, 2), LV7(6, 13, 1), LV9(9, 11, 0)|
 |2018/02/06|Ntest LV5(16, 3, 1), LV7(12, 8, 0), LV9(2, 17, 1)|
+|2018/02/07|Ntest LV5(15, 5, 0), LV7(11, 7, 2), LV9(5, 15, 0), LV11(1, 8, 1), LV13(1, 9, 0)|
 
 
 ### loss graph
