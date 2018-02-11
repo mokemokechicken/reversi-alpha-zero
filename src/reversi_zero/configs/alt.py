@@ -47,6 +47,8 @@ class PlayConfig:
         self.resign_threshold_delta = 0.01
         self.policy_decay_turn = 30
         self.policy_decay_power = 3
+        self.use_resolver_turn = None
+        self.use_resolver_turn_in_simulation = 50
 
         #
         self.schedule_of_simulation_num_per_move = [

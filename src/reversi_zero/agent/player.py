@@ -11,6 +11,7 @@ from reversi_zero.agent.api import ReversiModelAPI
 from reversi_zero.config import Config
 from reversi_zero.env.reversi_env import ReversiEnv, Player, Winner, another_player
 from reversi_zero.lib.bitboard import find_correct_moves, bit_to_array, flip_vertical, rotate90, dirichlet_noise_of_mask
+from reversi_zero.lib.reversi_resolver import ReversiResolver
 
 CounterKey = namedtuple("CounterKey", "black white next_player")
 QueueItem = namedtuple("QueueItem", "state future")
@@ -54,6 +55,7 @@ class ReversiPlayer:
         self.thinking_history = {}  # for fun
         self.resigned = False
         self.requested_stop_thinking = False
+        self.resolver = ReversiResolver()
 
     @staticmethod
     def create_mtcs_info():
@@ -93,6 +95,11 @@ class ReversiPlayer:
         self.callback_in_mtcs = callback_in_mtcs
         pc = self.play_config
 
+        if pc.use_resolver_turn and env.turn >= pc.use_resolver_turn:
+            ret = self.action_by_searching(key)
+            if ret:
+                return ret
+
         for tl in range(self.play_config.thinking_loop):
             if env.turn > 0:
                 self.search_moves(own, enemy)
@@ -109,9 +116,7 @@ class ReversiPlayer:
                 break
 
         # this is for play_gui, not necessary when training.
-        next_key = self.get_next_key(own, enemy, action)
-        self.thinking_history[(own, enemy)] = HistoryItem(action, policy, list(self.var_q(key)), list(self.var_n[key]),
-                                                          list(self.var_q(next_key)), list(self.var_n[next_key]))
+        self.update_thinking_history(own, enemy, action, policy)
 
         if self.play_config.resign_threshold is not None and\
                         np.max(self.var_q(key) - (self.var_n[key] == 0)*10) <= self.play_config.resign_threshold:
@@ -126,12 +131,31 @@ class ReversiPlayer:
         self.add_data_to_move_buffer_with_8_symmetries(own, enemy, saved_policy)
         return ActionWithEvaluation(action=action, n=self.var_n[key][action], q=self.var_q(key)[action])
 
+    def update_thinking_history(self, black, white, action, policy):
+        key = CounterKey(black, white, Player.black.value)
+        next_key = self.get_next_key(black, white, action)
+        self.thinking_history[(black, white)] = \
+            HistoryItem(action, policy, list(self.var_q(key)), list(self.var_n[key]),
+                        list(self.var_q(next_key)), list(self.var_n[next_key]))
+
     def bypass_first_move(self, key):
         legal_array = bit_to_array(find_correct_moves(key.black, key.white), 64)
         action = np.argmax(legal_array)
         self.var_n[key][action] = 1
         self.var_w[key][action] = 0
         self.var_p[key] = legal_array / np.sum(legal_array)
+
+    def action_by_searching(self, key):
+        action, score = self.resolver.resolve(key.black, key.white, Player(key.next_player))
+        if action is None:
+            return None
+        policy = np.zeros(64)
+        policy[action] = 1
+        self.var_n[key][action] = 999
+        self.var_w[key][action] = score * 999
+        self.var_p[key] = policy
+        self.update_thinking_history(key.black, key.white, action, policy)
+        return ActionWithEvaluation(action=action, n=1, q=score)
 
     def stop_thinking(self):
         self.requested_stop_thinking = True
@@ -207,6 +231,21 @@ class ReversiPlayer:
         key = self.counter_key(env)
         another_side_key = self.another_side_counter_key(env)
 
+        if self.config.play.use_resolver_turn_in_simulation and \
+                env.turn >= self.config.play.use_resolver_turn_in_simulation:
+            action, score = self.resolver.resolve(key.black, key.white, Player(key.next_player))
+            if action:
+                leaf_v = np.sign(score)
+                leaf_p = np.zeros(64)
+                leaf_p[action] = 1
+                self.var_n[key][action] += 1
+                self.var_w[key][action] += leaf_v
+                self.var_p[key] = leaf_p
+                self.var_n[another_side_key][action] += 1
+                self.var_w[another_side_key][action] -= leaf_v
+                self.var_p[another_side_key] = leaf_p
+                return np.sign(score)
+
         while key in self.now_expanding:
             await asyncio.sleep(self.config.play.wait_for_expanding_sleep_sec)
 
@@ -248,7 +287,6 @@ class ReversiPlayer:
 
         key = self.counter_key(env)
         another_side_key = self.another_side_counter_key(env)
-
         self.now_expanding.add(key)
 
         black, white = env.board.black, env.board.white

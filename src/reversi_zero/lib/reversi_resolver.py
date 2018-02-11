@@ -1,23 +1,50 @@
+from time import time
+
+from logging import getLogger
+
 from reversi_zero.env.reversi_env import ReversiEnv, Player
 from reversi_zero.lib.bitboard import find_correct_moves
 import numpy as np
 
 
+logger = getLogger(__name__)
+
+
+class Timeout(Exception):
+    pass
+
+
 class ReversiResolver:
+    """calculate which is winner.
+
+    this implementation runs very slow.
+    """
     def __init__(self):
         self.cache = {}
+        self.start_time = None
+        self.timeout = None
 
-    def resolve(self, env: ReversiEnv):
-        # print(f"start resolve from turn={env.turn}")
-        move, score = self.find_best_move_and_score(ReversiEnv().update(env.board.black, env.board.white, env.next_player))
-        if env.next_player == Player.white:
-            score = -score
-        return move, score
+    def resolve(self, black, white, next_player, timeout=30):
+        self.timeout = timeout
+        self.start_time = time()
+        try:
+            # logger.debug("start resolving")
+            move, score = self.find_winning_move_and_score(ReversiEnv().update(black, white, next_player))
+            if next_player == Player.white:
+                score = -score
+            logger.debug(f"resolve answer=({move},{score})({time()-self.start_time:.3f} seconds)")
+            return move, score
+        except Timeout:
+            return None, None
 
-    def find_best_move_and_score(self, env: ReversiEnv):
+    def find_winning_move_and_score(self, env: ReversiEnv):
         if env.done:
             b, w = env.board.number_of_black_and_white
             return None, b - w
+        if time() - self.start_time > self.timeout:
+            logger.debug("timeout!")
+            raise Timeout()
+
         turn = env.turn
         key = black, white, next_player = env.board.black, env.board.white, env.next_player
         if key in self.cache:
@@ -40,8 +67,15 @@ class ReversiResolver:
             env.winner = None
             #
             env.step(action)
-            _, score = self.find_best_move_and_score(env)
+            _, score = self.find_winning_move_and_score(env)
             score_list[i] = score
+
+            # do not need to find the best score move
+            if next_player == Player.black and score > 0:
+                break
+            elif next_player == Player.white and score < 0:
+                break
+
         # print(list(zip(action_list, score_list)))
 
         if next_player == Player.black:
@@ -71,10 +105,9 @@ if __name__ == '__main__':
         #  XXXXXO#
         ##########'''
         b, w = parse_to_bitboards(board)
-        e = ReversiEnv().update(b, w, Player.white)
         rr = ReversiResolver()
         print("correct is (57, +2)")
-        print(rr.resolve(e))
+        print(rr.resolve(b, w, Player.white))
         print(len(rr.cache))
 
     def q2():
@@ -90,10 +123,9 @@ if __name__ == '__main__':
         #OOOOOOOO#
         ##########'''
         b, w = parse_to_bitboards(board)
-        e = ReversiEnv().update(b, w, Player.black)
         rr = ReversiResolver()
         print("correct is (4 or 14, -2)")
-        print(rr.resolve(e))
+        print(rr.resolve(b, w, Player.black))
         print(len(rr.cache))
 
     q1()
