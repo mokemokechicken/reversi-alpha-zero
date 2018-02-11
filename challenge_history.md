@@ -233,6 +233,7 @@ I usually evaluate with RAZ:20. (win, lose, draw).
 |2018/02/07|Ntest LV5(15, 5, 0), LV7(11, 7, 2), LV9(5, 15, 0), LV11(1, 8, 1), LV13(1, 9, 0)|
 |2018/02/08|Ntest LV7(14, 5, 1), LV9(3, 17, 0), LV11(3, 13, 4)|
 |2018/02/09|Ntest LV5(7, 3, 0), LV7(12, 7, 1), LV9(3, 6, 1), LV11(2, 18, 0), there is big winning percentage difference between black and white. |
+|2018/02/10|Ntest LV5(13, 3, 4), LV7(20, 9, 1), LV9(10, 14, 6), LV11(17, 13, 0), LV13(4, 5, 1)|
 
 
 ### loss graph
