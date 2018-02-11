@@ -97,7 +97,7 @@ class ReversiPlayer:
 
         if pc.use_resolver_turn and env.turn >= pc.use_resolver_turn:
             ret = self.action_by_searching(key)
-            if ret:
+            if ret:  # not save move as play data
                 return ret
 
         for tl in range(self.play_config.thinking_loop):
@@ -146,16 +146,16 @@ class ReversiPlayer:
         self.var_p[key] = legal_array / np.sum(legal_array)
 
     def action_by_searching(self, key):
-        action, score = self.resolver.resolve(key.black, key.white, Player(key.next_player))
+        action, score = self.resolver.resolve(key.black, key.white, Player(key.next_player), exactly=True)
         if action is None:
             return None
         policy = np.zeros(64)
         policy[action] = 1
         self.var_n[key][action] = 999
-        self.var_w[key][action] = score * 999
+        self.var_w[key][action] = np.sign(score) * 999
         self.var_p[key] = policy
         self.update_thinking_history(key.black, key.white, action, policy)
-        return ActionWithEvaluation(action=action, n=1, q=score)
+        return ActionWithEvaluation(action=action, n=999, q=np.sign(score))
 
     def stop_thinking(self):
         self.requested_stop_thinking = True
@@ -233,7 +233,8 @@ class ReversiPlayer:
 
         if self.config.play.use_resolver_turn_in_simulation and \
                 env.turn >= self.config.play.use_resolver_turn_in_simulation:
-            action, score = self.resolver.resolve(key.black, key.white, Player(key.next_player))
+            action, score = self.resolver.resolve(key.black, key.white, Player(key.next_player), exactly=False)
+            score = score if env.next_player == Player.black else -score
             if action:
                 leaf_v = np.sign(score)
                 leaf_p = np.zeros(64)
