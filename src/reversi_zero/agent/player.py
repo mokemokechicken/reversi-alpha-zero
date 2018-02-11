@@ -149,6 +149,7 @@ class ReversiPlayer:
         action, score = self.resolver.resolve(key.black, key.white, Player(key.next_player), exactly=True)
         if action is None:
             return None
+        # logger.debug(f"action_by_searching: score={score}")
         policy = np.zeros(64)
         policy[action] = 1
         self.var_n[key][action] = 999

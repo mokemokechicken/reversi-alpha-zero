@@ -26,6 +26,7 @@ def start(config: Config):
     for h in root_logger.handlers:
         if isinstance(h, StreamHandler) and not isinstance(h, FileHandler):
             root_logger.removeHandler(h)
+    logger.info(f"config type={config.type}")
     NBoardEngine(config).start()
     logger.info("finish nboard")
 

@@ -38,7 +38,7 @@ class ReversiResolver:
                                                            exactly=exactly)
             if next_player == Player.white:
                 score = -score
-            logger.debug(f"resolve answer=({move},{score})({time()-self.start_time:.3f} seconds)")
+            # logger.debug(f"resolve answer=({move},{score})({time()-self.start_time:.3f} seconds)")
             return move, score
         except Timeout:
             return None, None
