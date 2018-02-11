@@ -49,7 +49,7 @@ class PlayConfig:
         self.policy_decay_power = 3
 
         # Using a resolver is a kind of cheating!
-        self.use_resolver_turn = 48
+        self.use_resolver_turn = 50
         self.use_resolver_turn_in_simulation = 50
 
         #
