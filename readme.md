@@ -11,9 +11,9 @@ Environment
 -----------
 
 * Python 3.6.3
-* tensorflow-gpu: 1.3.0
+* tensorflow-gpu: 1.3.0 (+)
   * tensorflow==1.3.0 is also ok, but very slow. When `play_gui`, tensorflow(cpu) is enough speed.
-* Keras: 2.0.8
+* Keras: 2.0.8 (+)
 
 Modules
 -------
