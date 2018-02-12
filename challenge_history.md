@@ -235,7 +235,7 @@ I usually evaluate with RAZ:20. (win, lose, draw).
 |2018/02/09|Ntest LV5(7, 3, 0), LV7(12, 7, 1), LV9(3, 6, 1), LV11(2, 18, 0), there is big winning percentage difference between black and white. |
 |2018/02/10|Ntest LV5(13, 3, 4), LV7(20, 9, 1), LV9(10, 14, 6), LV11(17, 13, 0), LV13(4, 5, 1)|
 |2018/02/11|Ntest LV7(18, 2, 0), LV9(6, 13, 1), LV11(6, 13, 1), LV13(2, 16, 3). start using solver. not estimate but calculate. It is no longer pure AlphaZero way!|
-|2018/02/12|Ntest LV7(10, 0, 0), LV9(10, 10, 0), LV11(2, 8, 0), LV13(3, 7, 0)|
+|2018/02/12|Ntest LV7(10, 0, 0), LV9(10, 10, 0), LV11(2, 8, 0), LV13(3, 7, 0), change `change_tau_turn` from 3 to 4.|
 
 
 ### loss graph
