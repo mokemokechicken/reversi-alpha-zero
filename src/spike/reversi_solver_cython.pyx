@@ -84,7 +84,7 @@ cdef class ReversiSolver:
 
             action = next_action(env)
             # print(("=" * stack.size()) + f"> ID={env.id} NP={env.next_player}:{action} best=({env.best_move},{env.best_score})")
-            if action == -1:
+            if action == -1 or (not exactly and env.best_score > 0):
                 child_env = stack.pop()
                 child_env.finished = 1
                 continue

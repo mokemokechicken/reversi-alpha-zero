@@ -97,6 +97,11 @@ def test_solve():
         ##########'''
         b, w = parse_to_bitboards(board)
         print("correct is (57, +2)")
+
+        start_time = time()
+        ret = p.ReversiSolver().solve(b, w, next_player=Player.white, exactly=False)
+        print(f"{time()-start_time} sec: ret={ret}")
+
         start_time = time()
         ret = c.ReversiSolver().solve(b, w, next_player=2, exactly=False)
         print(f"{time()-start_time} sec: ret={ret}")
@@ -120,8 +125,12 @@ def test_solve():
         #OOOOOOOO#
         ##########'''
         b, w = parse_to_bitboards(board)
+
         start_time = time()
-        print(p.ReversiSolver().solve(b, w, next_player=Player.black, exactly=True))
+        ret = p.ReversiSolver().solve(b, w, next_player=Player.black, exactly=True)
+        print(f"{time()-start_time} sec: ret={ret}")
+
+        start_time = time()
         ret = c.ReversiSolver().solve(b, w, next_player=1, exactly=True)
         print(f"{time()-start_time} sec: ret={ret}")
 
@@ -145,7 +154,7 @@ def test_solve():
         ret = c.ReversiSolver().solve(b, w, next_player=1, exactly=True)
         print(f"{time()-start_time} sec: ret={ret}")
 
-    q3()
+    q2()
 
 
 def test_bitcount():
