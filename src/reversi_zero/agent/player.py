@@ -11,7 +11,7 @@ from reversi_zero.agent.api import ReversiModelAPI
 from reversi_zero.config import Config
 from reversi_zero.env.reversi_env import ReversiEnv, Player, Winner, another_player
 from reversi_zero.lib.bitboard import find_correct_moves, bit_to_array, flip_vertical, rotate90, dirichlet_noise_of_mask
-from reversi_zero.lib.reversi_solver import ReversiSolver
+
 
 CounterKey = namedtuple("CounterKey", "black white next_player")
 QueueItem = namedtuple("QueueItem", "state future")
@@ -55,7 +55,7 @@ class ReversiPlayer:
         self.thinking_history = {}  # for fun
         self.resigned = False
         self.requested_stop_thinking = False
-        self.solver = ReversiSolver()
+        self.solver = self.create_solver()
 
     @staticmethod
     def create_mtcs_info():
@@ -235,8 +235,8 @@ class ReversiPlayer:
         if self.config.play.use_solver_turn_in_simulation and \
                 env.turn >= self.config.play.use_solver_turn_in_simulation:
             action, score = self.solver.solve(key.black, key.white, Player(key.next_player), exactly=False)
-            score = score if env.next_player == Player.black else -score
             if action:
+                score = score if env.next_player == Player.black else -score
                 leaf_v = np.sign(score)
                 leaf_p = np.zeros(64)
                 leaf_p[action] = 1
@@ -432,3 +432,9 @@ class ReversiPlayer:
     def normalize(p, t=1):
         pp = np.power(p, t)
         return pp / np.sum(pp)
+
+    def create_solver(self):
+        # from reversi_zero.lib.reversi_solver import ReversiSolver
+        from reversi_zero.lib.alt.reversi_solver import ReversiSolver
+        return ReversiSolver()
+

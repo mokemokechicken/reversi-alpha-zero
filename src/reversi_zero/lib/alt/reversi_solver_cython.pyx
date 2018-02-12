@@ -1,5 +1,6 @@
 from time import time
 
+from reversi_zero.env.reversi_env import Player
 from .bitboard_cython import bit_count, find_correct_moves, calc_flip
 
 # CONST
@@ -30,39 +31,36 @@ cdef struct Env:
 
 cdef class ReversiSolver:
     cdef dict cache
-    cdef float start_time
-    cdef int timeout
     cdef int last_is_exactly
 
     def __init__(self):
         self.cache = {}
-        self.start_time = 0
-        self.timeout = 0
         self.last_is_exactly = 0
 
-    def solve(self, black, white, next_player: int, timeout=30, exactly=False):
+    def solve(self, black, white, next_player, timeout=30, exactly=False):
         """
 
         :param black:
         :param white:
-        :param next_player: 1=Black, 2=White
+        :param Player next_player: 1=Black, 2=White
         :param timeout:
         :param exactly:
         :return:
         """
-        self.timeout = int(timeout)
-        self.start_time = time()
         if not self.last_is_exactly and exactly:
             self.cache = {}
         self.last_is_exactly = exactly
 
-        result = self.find_winning_move_and_score(black, white, next_player, exactly)
+        print("start solving")
+        start_time = time()
+        result = self.find_winning_move_and_score(black, white, next_player.value, exactly, int(timeout))
+        print(f"finish solving({time() - start_time:.4f} sec) {result}")
         if result.move < 0:
             return None, None
         else:
             return result.move, result.score
 
-    cdef SolveResult find_winning_move_and_score(self, unsigned long long black, unsigned long long white, int next_player, int exactly):
+    cdef SolveResult find_winning_move_and_score(self, unsigned long long black, unsigned long long white, int next_player, int exactly, int timeout):
         cdef Env* child_env = NULL
         cdef Env* env
         cdef Env* next_env
@@ -76,8 +74,9 @@ cdef class ReversiSolver:
         else:
             root_env = stack.add(white, black, next_player)
 
+        start_time = time()
         while stack.size():
-            if time() - self.start_time > self.timeout:
+            if time() - start_time > timeout:
                 return SolveResult(-1, -100)
 
             env = stack.top()

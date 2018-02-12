@@ -154,7 +154,30 @@ def test_solve():
         ret = c.ReversiSolver().solve(b, w, next_player=1, exactly=True)
         print(f"{time()-start_time} sec: ret={ret}")
 
-    q2()
+    def q4():
+        import reversi_zero.lib.reversi_solver as p
+        import spike.reversi_solver_cython as c
+        board = '''
+        ##########
+        # X  XXXO#
+        #O XXXXXX#
+        #OOXOOOXX#
+        #OOOOOOXO#
+        #OOOOXOOO#
+        #OOOOXOOX#
+        # XXXOO  #
+        #   OOO  #
+        ##########'''
+        b, w = parse_to_bitboards(board)
+        start_time = time()
+        ret = p.ReversiSolver().solve(b, w, next_player=Player.black, exactly=True)
+        print(f"{time()-start_time} sec: ret={ret}")
+
+        start_time = time()
+        ret = c.ReversiSolver().solve(b, w, next_player=1, exactly=True)
+        print(f"{time()-start_time} sec: ret={ret}")
+
+    q4()
 
 
 def test_bitcount():
