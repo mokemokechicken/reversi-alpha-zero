@@ -14,7 +14,7 @@ class Timeout(Exception):
     pass
 
 
-class ReversiResolver:
+class ReversiSolver:
     """calculate which is winner. Not estimation by NN!
 
     this implementation runs very slow. (^^;
@@ -25,7 +25,7 @@ class ReversiResolver:
         self.timeout = None
         self.last_is_exactly = False
 
-    def resolve(self, black, white, next_player, timeout=30, exactly=False):
+    def solve(self, black, white, next_player, timeout=30, exactly=False):
         self.timeout = timeout
         self.start_time = time()
         if not self.last_is_exactly and exactly:
@@ -38,7 +38,7 @@ class ReversiResolver:
                                                            exactly=exactly)
             if next_player == Player.white:
                 score = -score
-            # logger.debug(f"resolve answer=({move},{score})({time()-self.start_time:.3f} seconds)")
+            # logger.debug(f"solve answer=({move},{score})({time()-self.start_time:.3f} seconds)")
             return move, score
         except Timeout:
             return None, None
@@ -112,9 +112,9 @@ if __name__ == '__main__':
         #  XXXXXO#
         ##########'''
         b, w = parse_to_bitboards(board)
-        rr = ReversiResolver()
+        rr = ReversiSolver()
         print("correct is (57, +2)")
-        print(rr.resolve(b, w, Player.white, exactly=False))
+        print(rr.solve(b, w, Player.white, exactly=False))
         print(len(rr.cache))
 
     def q2():
@@ -130,9 +130,9 @@ if __name__ == '__main__':
         #OOOOOOOO#
         ##########'''
         b, w = parse_to_bitboards(board)
-        rr = ReversiResolver()
+        rr = ReversiSolver()
         print("correct is (4 or 14, -2)")
-        print(rr.resolve(b, w, Player.black, exactly=False))
+        print(rr.solve(b, w, Player.black, exactly=False))
         print(len(rr.cache))
 
     def q3():  # O: black, X: white
@@ -148,9 +148,9 @@ if __name__ == '__main__':
         #  OOOOX #
         ##########'''
         b, w = parse_to_bitboards(board)
-        rr = ReversiResolver()
+        rr = ReversiSolver()
         print("correct is (3, +2)")
-        print(rr.resolve(b, w, Player.white, exactly=True))
+        print(rr.solve(b, w, Player.white, exactly=True))
         print(len(rr.cache))
 
     q3()
