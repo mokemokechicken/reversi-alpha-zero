@@ -21,16 +21,12 @@ cdef struct Env:
     int best_move
     int best_score
     int next_search_action
-    int id
 
-cdef int env_id = 0
 
-cdef Env create_env(unsigned long long own, unsigned long long enemy, int next_player):
-    global env_id
-    legal_moves = find_correct_moves(own, enemy)
-    env_id += 1
-    return Env(own, enemy, next_player, legal_moves, 0, -1, best_move=-1, best_score=-100, next_search_action=0, id=env_id)
-
+# cdef Env create_env(unsigned long long own, unsigned long long enemy, int next_player):
+#     legal_moves = find_correct_moves(own, enemy)
+#     return Env(own, enemy, next_player, legal_moves, 0, -1, best_move=-1, best_score=-100, next_search_action=0)
+#
 
 cdef class ReversiSolver:
     cdef dict cache
@@ -45,6 +41,15 @@ cdef class ReversiSolver:
         self.last_is_exactly = 0
 
     def solve(self, black, white, next_player: int, timeout=30, exactly=False):
+        """
+
+        :param black:
+        :param white:
+        :param next_player: 1=Black, 2=White
+        :param timeout:
+        :param exactly:
+        :return:
+        """
         self.timeout = int(timeout)
         self.start_time = time()
         if not self.last_is_exactly and exactly:
@@ -55,19 +60,18 @@ cdef class ReversiSolver:
         return result
 
     cdef SolveResult find_winning_move_and_score(self, unsigned long long black, unsigned long long white, int next_player, int exactly):
-        cdef Env *child_env = NULL
-        cdef Env *env
-        cdef Env next_env
+        cdef Env* child_env = NULL
+        cdef Env* env
+        cdef Env* next_env
         cdef EnvStack stack = EnvStack()
         cdef unsigned long long next_own, next_enemy
         cdef int root_next_player = next_player
+        cdef Env* root_env
 
         if next_player == BLACK:
-            stack.add(create_env(black, white, next_player))
+            root_env = stack.add(black, white, next_player)
         else:
-            stack.add(create_env(white, black, next_player))
-
-        root_env = stack.top()
+            root_env = stack.add(white, black, next_player)
 
         while stack.size():
             env = stack.top()
@@ -90,17 +94,15 @@ cdef class ReversiSolver:
                 continue
 
             flipped = calc_flip(action, env.own, env.enemy)
-
             next_own = (env.own ^ flipped) | (1 << action)
             next_enemy = env.enemy ^ flipped
+
             if find_correct_moves(next_enemy, next_own) > 0:
-                next_env = create_env(next_enemy, next_own, 3 - env.next_player)  # next_player: 2 => 1, 1 => 2
+                next_env = stack.add(next_enemy, next_own, 3 - env.next_player)  # next_player: 2 => 1, 1 => 2
                 next_env.parent_action = action
-                stack.add(next_env)
             elif find_correct_moves(next_own, next_enemy) > 0:
-                next_env = create_env(next_own, next_enemy, env.next_player)
+                next_env = stack.add(next_own, next_enemy, env.next_player)
                 next_env.parent_action = action
-                stack.add(next_env)
             else:
                 score = bit_count(next_own) - bit_count(next_enemy)
                 if env.best_score < score:
@@ -125,10 +127,19 @@ cdef class EnvStack:
     def __init__(self):
         self.pos = 0
 
-    cdef add(self, Env env):
-        self.stack[self.pos] = env
-        # print(f"add: {env.id} to pos: {self.pos}")
+    cdef Env* add(self, unsigned long long own, unsigned long long enemy, int next_player):
+        cdef Env* env = &self.stack[self.pos]
+        env.own = own
+        env.enemy = enemy
+        env.next_player = next_player
+        env.legal_moves = find_correct_moves(own, enemy)
+        env.finished = 0
+        env.parent_action = -1
+        env.best_move = -1
+        env.best_score = -100
+        env.next_search_action = 0
         self.pos += 1
+        return env
 
     cdef Env* top(self):
         return &(self.stack[self.pos - 1])
@@ -145,4 +156,3 @@ cdef class EnvStack:
     cdef debug(self):
         for i in range(self.pos):
             print(f"{i}: {self.stack[i].id}")
-

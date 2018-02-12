@@ -1,4 +1,4 @@
-def find_correct_moves(own, enemy):
+cpdef unsigned long long find_correct_moves(unsigned long long own, unsigned long long enemy):
     """return legal moves"""
     left_right_mask = 0x7e7e7e7e7e7e7e7e  # Both most left-right edge are 0, else 1
     top_bottom_mask = 0x00ffffffffffff00  # Both most top-bottom edge are 0, else 1
@@ -15,7 +15,7 @@ def find_correct_moves(own, enemy):
     return mobility
 
 
-def calc_flip(pos, own, enemy):
+cpdef unsigned long long calc_flip(int pos, unsigned long long own, unsigned long long enemy):
     """return flip stones of enemy by bitboard when I place stone at pos.
 
     :param pos: 0~63
