@@ -78,7 +78,25 @@ Create `.env` file and write this.
 KERAS_BACKEND=tensorflow
 ```
 
-### Download Trained BestModel(If needed)
+Strongest Model
+---------------
+Now, "challenge 5 model" and "ch5 config" are strongest in my models.
+If you want to play with it,
+
+```bash
+rm -rf data/model/next_generation/
+sh ./download_model.sh 5
+# run as wxPython GUI
+python src/reversi_zero/run.py play_gui --type ch5
+```
+
+If you want to use as a NBoard engine(see below "Run as NBoard2.0 Engine"), please use `nboard_engine --type ch5` for the Command. 
+
+Past Models
+------------
+Please remove( or rename) `data/model/next_generation/` directory if you want to use "BestModel" at `data/model/model_best_*`.
+
+### Download Trained BestModel
 
 Download trained BestModel(trained by bellow Challenge 1) for example.
 
@@ -86,9 +104,9 @@ Download trained BestModel(trained by bellow Challenge 1) for example.
 sh ./download_best_model.sh
 ```
 
-### Download Trained the Newest Model(If needed)
+### Download Trained the Newest Model
 
-Download trained the newest model(trained by Challenge 2, 3) as BestModel.
+Download trained the newest model(trained by Challenge 2, 3, 4, 5) as BestModel.
 
 ```bash
 sh ./download_model.sh <version>
@@ -97,7 +115,7 @@ sh ./download_model.sh <version>
 ex)
 
 ```bash
-sh ./download_model.sh 2
+sh ./download_model.sh 5
 ```
 
 Configuration
@@ -148,6 +166,7 @@ If you find a good parameter set, please share in the github issues!
 * `dirichlet_noise_only_for_legal_moves`: if true, apply dirichlet noise only for legal moves. I don't know whether the DeepMind setting was true or false.
 * `share_mtcs_info_in_self_play`: extra option. if true, share MCTS tree node information among games in self-play.
   * `reset_mtcs_info_per_game`: reset timing of shared MCTS information.
+* `use_solver_turn`, `use_solver_turn_in_simulation`: use solver from this turn. not use it if `None`.   
 
 ### TrainerConfig
 
@@ -253,7 +272,8 @@ It can add external engines that implement [NBoard Protocol](https://github.com/
 * (3) set parameter:
   * `Name` = `RAZ` (for example)
   * `Working Directory` = PATH TO THIS PROJECT
-  * `Command` = `nboard_engine` or `bash nboard_engine`
+  * `Command` = `nboard_engine` or `bash nboard_engine`. If you want to specify config type, `nboard_engine --type ch5`.
+  
 * (4) Engine Level N is set as `simulation_num_per_move=N*20`
 
 <img src="doc/img/add_to_nboard.png" width="50%">
