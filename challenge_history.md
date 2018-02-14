@@ -237,7 +237,19 @@ I usually evaluate with RAZ:20. (win, lose, draw).
 |2018/02/11|Ntest LV7(18, 2, 0), LV9(6, 13, 1), LV11(6, 13, 1), LV13(2, 16, 3). start using solver. not estimate but calculate. It is no longer pure AlphaZero way!|
 |2018/02/12|Ntest LV7(10, 0, 0), LV9(16, 14, 0), LV11(6, 12, 2), LV13(6, 10, 4), change `change_tau_turn` from 3 to 4.|
 |2018/02/13|Ntest LV9(11, 8, 1), LV11(5, 12, 4), LV13(4, 13, 3)|
-|2018/02/14|Ntest LV5(9, 0, 1) LV7(10, 0, 0), LV9(6, 3, 1), LV11(4, 4, 2), LV13(2, 6, 2)|
+
+There are many draw games(more than 70%) in self-play.
+However, it seems that the model does not become weak now.
+Many draw games, but there are variety of draw games.
+I changed reset_mtcs_info_per_game from 5 to 1.
+
+<img width="50%" src="doc/img/20180214_winner_counts.png">
+
+I think there is possibility that the model will be collapsed, I will continue because it is interesting.
+
+|date|note|
+|:---:|---|
+|2018/02/14|Ntest LV5(9, 0, 1) LV7(10, 0, 0), LV9(12, 6, 2), LV11(4, 4, 2), LV13(2, 6, 2)|
 
 
 ### loss graph
