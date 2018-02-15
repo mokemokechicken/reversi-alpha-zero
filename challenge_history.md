@@ -250,7 +250,7 @@ I think there is possibility that the model will be collapsed, I will continue b
 |date|note|
 |:---:|---|
 |2018/02/14|Ntest LV5(9, 0, 1) LV7(10, 0, 0), LV9(23, 11, 6), LV11(8, 23, 9), LV13(7, 28, 5), LV15(0, 9, 1)|
-|2018/02/15|Ntest LV7(5, 4, 1), LV9(5, 5, 0), LV11(3, 4, 3), LV13(6, 4, 0)|
+|2018/02/15|Ntest LV7(12, 6, 2), LV9(12, 14, 4), LV11(10, 15, 5), LV13(14, 15, 1)|
 
 
 ### loss graph
