@@ -16,7 +16,7 @@ class PlayDataConfig:
         # Max Training Data Size = nb_game_in_file * max_file_num * 8
         self.multi_process_num = 16
         self.nb_game_in_file = 2
-        self.max_file_num = 800
+        self.max_file_num = 2000  # 800
         self.save_policy_of_tau_1 = True
         self.enable_ggf_data = True
         self.nb_game_in_ggf_file = 100
