@@ -33,7 +33,6 @@ class PlayConfig:
         self.c_puct = 1
         self.noise_eps = 0.25
         self.dirichlet_alpha = 0.5
-        self.dirichlet_noise_only_for_legal_moves = True
         self.change_tau_turn = 4
         self.virtual_loss = 3
         self.prediction_queue_size = 16

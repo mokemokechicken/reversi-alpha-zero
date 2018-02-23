@@ -403,13 +403,6 @@ class ReversiPlayer:
         xx_ = max(xx_, 1)  # avoid u_=0 if N is all 0
         p_ = self.var_p[key]
 
-        if is_root_node and self.play_config.noise_eps > 0:  # Is it correct?? -> (1-e)p + e*Dir(alpha)
-            if self.play_config.dirichlet_noise_only_for_legal_moves:
-                noise = dirichlet_noise_of_mask(legal_moves, self.play_config.dirichlet_alpha)
-            else:
-                noise = np.random.dirichlet([self.play_config.dirichlet_alpha] * 64)
-            p_ = (1 - self.play_config.noise_eps) * p_ + self.play_config.noise_eps * noise
-
         # re-normalize in legal moves
         p_ = p_ * bit_to_array(legal_moves, 64)
         if np.sum(p_) > 0:
@@ -418,6 +411,10 @@ class ReversiPlayer:
             temperature = min(np.exp(1-np.power(env.turn/_pc.policy_decay_turn, _pc.policy_decay_power)), 1)
             # normalize and decay policy
             p_ = self.normalize(p_, temperature)
+
+        if is_root_node and self.play_config.noise_eps > 0:  # Is it correct?? -> (1-e)p + e*Dir(alpha)
+            noise = dirichlet_noise_of_mask(legal_moves, self.play_config.dirichlet_alpha)
+            p_ = (1 - self.play_config.noise_eps) * p_ + self.play_config.noise_eps * noise
 
         u_ = self.play_config.c_puct * p_ * xx_ / (1 + self.var_n[key])
         if env.next_player == Player.black:
