@@ -255,6 +255,10 @@ I think there is possibility that the model will be collapsed, I will continue b
 |2018/02/17|Ntest LV9(10, 6, 4), LV11(8, 11, 1), LV13(2, 17, 1)|
 |2018/02/18|Ntest LV5(9, 0, 1), LV7(6, 2, 2), LV9(10, 0, 0), LV11(3, 4, 3), LV13(2, 6, 2), LV15(1, 9, 0)|
 |2018/02/19|Ntest LV9(20, 7, 3), LV11(16, 11, 3), LV13(5, 18, 7)|
+|2018/02/20|Ntest LV9(5, 5, 0), LV11(6, 3, 1), LV13(1, 8, 1), LV15(0, 9, 1)|
+|2018/02/20:2|Ntest LV9(0, 9, 1), LV11(3, 5, 2), LV13(4, 6, 0), LV15(2, 8, 0)|
+|2018/02/21|Ntest LV7(15, 5, 0), LV9(5, 12, 3), LV11(12, 6, 2), LV13(2, 18, 0), LV15(1, 17, 2), change max_file_num from 800 to 2000|
+|2018/02/22|Ntest LV9(9, 8, 3), LV11(8, 10, 2), LV13(5, 13, 2)|
 
 
 ### loss graph
