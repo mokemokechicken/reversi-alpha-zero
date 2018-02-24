@@ -1,3 +1,4 @@
+import cProfile
 import os
 from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime
@@ -135,6 +136,9 @@ class SelfPlayWorker:
                 f.write(str(game_idx))
 
     def start_game(self, local_idx, last_game_idx, mtcs_info):
+        # profiler = cProfile.Profile()
+        # profiler.enable()
+
         self.env.reset()
         enable_resign = self.config.play.disable_resignation_rate <= random()
         self.config.play.simulation_num_per_move = self.decide_simulation_num_per_move(last_game_idx)
@@ -164,6 +168,9 @@ class SelfPlayWorker:
             is_write = local_idx % self.config.play_data.nb_game_in_ggf_file == 0
             is_write |= local_idx <= 5
             self.save_ggf_data(write=is_write)
+
+        # profiler.disable()
+        # profiler.dump_stats(f"profile-worker-{self.worker_index}-{local_idx}")
         return self.env
 
     def create_reversi_player(self, enable_resign=None, mtcs_info=None):
