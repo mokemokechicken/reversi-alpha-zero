@@ -13,7 +13,14 @@ play:
   use_newest_next_generation_model: True
 
 trainer:
+  batch_size: 8
   delete_self_play_after_number_of_training: 1
   min_data_size_to_learn: 1
-  save_model_steps: 10
+  save_model_steps: 400
+  logging_per_steps: 25
   wait_after_save_model_ratio: 0
+  lr_schedules:
+  - [0, 0.01]
+  - [500000, 0.001]
+  - [1000000, 0.0001]
+  - [1500000, 0.00001]
