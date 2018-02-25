@@ -1,0 +1,38 @@
+type: AlphaGoZero
+
+play: &play_config
+  use_newest_next_generation_model: False
+  simulation_num_per_move: 400
+  share_mtcs_info_in_self_play: False
+  thinking_loop: 1
+  c_puct: 5
+  change_tau_turn: 10
+  parallel_search_num: 8
+  allowed_resign_turn: 20
+  use_solver_turn: 0
+  use_solver_turn_in_simulation: 0
+  schedule_of_simulation_num_per_move:
+    - [0, 400]
+
+play_data:
+  save_policy_of_tau_1: False
+
+trainer:
+  wait_after_save_model_ratio: 0  # no wait
+  batch_size: 256
+  min_data_size_to_learn: 10000
+  lr_schedules:
+    - [0, 0.01]
+    - [100000, 0.001]
+    - [200000, 0.0001]
+
+eval:
+  game_num: 200
+  replace_rate: 0.55
+  play_config:
+    <<: *play_config
+    change_tau_turn: 0
+    noise_eps: 0
+
+play_with_human:
+  use_newest_next_generation_model: False

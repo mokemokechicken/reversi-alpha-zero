@@ -21,7 +21,7 @@ HintResponse = namedtuple("HintResponse", "action value visit")
 
 
 def start(config: Config):
-    PlayWithHumanConfig().update_play_config(config.play)
+    config.play_with_human.update_play_config(config.play)
     root_logger = getLogger()
     for h in root_logger.handlers:
         if isinstance(h, StreamHandler) and not isinstance(h, FileHandler):

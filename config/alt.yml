@@ -1,0 +1,10 @@
+type: alt
+
+play:
+  simulation_num_per_move: 50
+  share_mtcs_info_in_self_play: True
+  reset_mtcs_info_per_game: 1
+  thinking_loop: 30
+  use_newest_next_generation_model: true
+  use_solver_turn: 50
+  use_solver_turn_in_simulation: 50
