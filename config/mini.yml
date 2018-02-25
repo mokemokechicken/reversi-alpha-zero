@@ -1,0 +1,53 @@
+type: mini
+
+model:
+  cnn_filter_num: 16
+  cnn_filter_size: 3
+  res_layer_num: 1
+  l2_reg: 0.0001
+  value_fc_size: 16
+
+play: &play_config
+  simulation_num_per_move: 10
+  share_mtcs_info_in_self_play: True
+  reset_mtcs_info_per_game: 3
+  thinking_loop: 2
+  required_visit_to_decide_action: 40
+  start_rethinking_turn: 10
+  c_puct: 5
+  change_tau_turn: 10
+  parallel_search_num: 4
+  allowed_resign_turn: 10
+  use_newest_next_generation_model: true
+  use_solver_turn: 50
+  use_solver_turn_in_simulation: 50
+  schedule_of_simulation_num_per_move:
+    - [0, 8]
+    - [1000, 20]
+
+play_data:
+  multi_process_num: 2
+  nb_game_in_file: 2
+  max_file_num: 10
+  save_policy_of_tau_1: true
+  enable_ggf_data: true
+  nb_game_in_ggf_file: 2
+
+trainer:
+  wait_after_save_model_ratio: 1  # wait after saving model
+  batch_size: 256
+  min_data_size_to_learn: 100
+  lr_schedules:
+    - [0, 0.01]
+    - [100000, 0.001]
+    - [200000, 0.0001]
+
+eval:
+  game_num: 100
+  replace_rate: 0.55
+  evaluate_latest_first: true
+  play_config:
+    <<: *play_config
+    c_puct: 1
+    change_tau_turn: 0
+    noise_eps: 0

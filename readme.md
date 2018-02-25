@@ -87,10 +87,10 @@ If you want to play with it,
 rm -rf data/model/next_generation/
 sh ./download_model.sh 5
 # run as wxPython GUI
-python src/reversi_zero/run.py play_gui --type ch5
+python src/reversi_zero/run.py play_gui -c config/ch5.yml
 ```
 
-If you want to use as a NBoard engine(see below "Run as NBoard2.0 Engine"), please use `nboard_engine --type ch5` for the Command. 
+If you want to use as a NBoard engine(see below "Run as NBoard2.0 Engine"), please use `nboard_engine -c config/ch5.yml` for the Command. 
 
 Past Models
 ------------
@@ -163,7 +163,6 @@ If you find a good parameter set, please share in the github issues!
 * `parallel_search_num`: balance parameter(?) of speed and accuracy in MCTS.
   * `prediction_queue_size` should be same or greater than `parallel_search_num`.
 * `dirichlet_alpha`: random parameter in self-play.
-* `dirichlet_noise_only_for_legal_moves`: if true, apply dirichlet noise only for legal moves. I don't know whether the DeepMind setting was true or false.
 * `share_mtcs_info_in_self_play`: extra option. if true, share MCTS tree node information among games in self-play.
   * `reset_mtcs_info_per_game`: reset timing of shared MCTS information.
 * `use_solver_turn`, `use_solver_turn_in_simulation`: use solver from this turn. not use it if `None`.   
@@ -190,7 +189,7 @@ If the BestModel does not exist, new random model will be created and become Bes
 
 ### options
 * `--new`: create new BestModel
-* `--type mini`: use mini config for testing, (see `src/reversi_zero/configs/mini.py`)
+* `-c config_yaml`: specify config yaml path override default settings of `config.py`
 
 Trainer
 -------
@@ -204,7 +203,7 @@ A base model will be loaded from latest saved next-generation model. If not exis
 Trained model will be saved every 2000 steps(mini-batch) after epoch.
 
 ### options
-* `--type mini`: use mini config for testing, (see `src/reversi_zero/configs/mini.py`)
+* `-c config_yaml`: specify config yaml path override default settings of `config.py`
 * `--total-step`: specify total step(mini-batch) numbers. The total step affects learning rate of training.
 
 Evaluator
@@ -219,7 +218,7 @@ It evaluates BestModel and the latest next-generation model by playing about 200
 If next-generation model wins, it becomes BestModel.
 
 ### options
-* `--type mini`: use mini config for testing, (see `src/reversi_zero/configs/mini.py`)
+* `-c config_yaml`: specify config yaml path override default settings of `config.py`
 
 Play Game
 ---------
@@ -272,7 +271,7 @@ It can add external engines that implement [NBoard Protocol](https://github.com/
 * (3) set parameter:
   * `Name` = `RAZ` (for example)
   * `Working Directory` = PATH TO THIS PROJECT
-  * `Command` = `nboard_engine` or `bash nboard_engine`. If you want to specify config type, `nboard_engine --type ch5`.
+  * `Command` = `nboard_engine` or `bash nboard_engine`. If you want to specify config type, `nboard_engine -c config/ch5.yml`.
   
 * (4) Engine Level N is set as `simulation_num_per_move=N*20`
 
