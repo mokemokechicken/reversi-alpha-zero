@@ -261,7 +261,7 @@ I think there is possibility that the model will be collapsed, I will continue b
 |2018/02/22|Ntest LV9(9, 8, 3), LV11(8, 10, 2), LV13(5, 13, 2)|
 |2018/02/23|Ntest LV9(9, 10, 1), LV11(12, 6, 2), LV13(0, 18, 2), fix dirichlet noise bug|
 |2018/02/24|Ntest LV9(15, 4, 1), LV11(11, 5, 4), LV13(0, 14, 6)|
-|2018/02/24|Ntest LV9(7, 2, 1), LV11(6, 4, 0), LV13(1, 8, 1)|
+|2018/02/24|Ntest LV9(7, 2, 1), LV11(6, 4, 0), LV13(1, 8, 1), set delete_self_play_after_number_of_training=1|
 
 
 ### loss graph
