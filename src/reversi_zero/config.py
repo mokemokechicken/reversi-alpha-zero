@@ -175,6 +175,7 @@ class TrainerConfig(ConfigBase):
         self.save_model_steps = 200
         self.use_tensorboard = True
         self.logging_per_steps = 100
+        self.delete_self_play_after_number_of_training = 0  # control ratio of train:self data.
         self.lr_schedules = [
             (0, 0.01),
             (150000, 0.001),
