@@ -103,6 +103,7 @@ class SelfPlayWorker:
         local_idx = 0
 
         while True:
+            np.random.seed(None)
             local_idx += 1
             game_idx = self.shared_var.game_idx
 

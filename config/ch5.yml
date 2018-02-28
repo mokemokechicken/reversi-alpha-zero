@@ -4,7 +4,7 @@ play_data:
   multi_process_num: 24
   nb_game_in_file: 1
   max_file_num: 800
-  drop_draw_game_rate: 0.9
+  drop_draw_game_rate: 0.98
 
 play:
   simulation_num_per_move: 200
