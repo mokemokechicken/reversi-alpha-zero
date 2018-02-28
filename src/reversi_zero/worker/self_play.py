@@ -177,10 +177,12 @@ class SelfPlayWorker:
         return ReversiPlayer(self.config, None, enable_resign=enable_resign, mtcs_info=mtcs_info, api=self.api)
 
     def save_play_data(self, write=True):
-        data = self.black.moves + self.white.moves
-        self.buffer += data
+        # drop draw game by drop_draw_game_rate
+        if self.black.moves[0][-1] != 0 or self.config.play_data.drop_draw_game_rate <= np.random.random():
+            data = self.black.moves + self.white.moves
+            self.buffer += data
 
-        if not write:
+        if not write or not self.buffer:
             return
 
         rc = self.config.resource

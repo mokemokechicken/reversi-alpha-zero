@@ -122,6 +122,7 @@ class PlayDataConfig(ConfigBase):
         self.save_policy_of_tau_1 = True
         self.enable_ggf_data = True
         self.nb_game_in_ggf_file = 100
+        self.drop_draw_game_rate = 0
 
 
 class PlayConfig(ConfigBase):
