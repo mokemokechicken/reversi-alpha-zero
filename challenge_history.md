@@ -265,6 +265,13 @@ I think there is possibility that the model will be collapsed, I will continue b
 |2018/02/26|Ntest LV7(3, 7, 0), LV9(5, 5, 0), LV11(1, 8, 1), LV13(2, 8, 0)|
 |2018/02/27|Ntest LV7(9, 0, 1), LV9(5, 1, 4), LV11(5, 3, 2), LV13(5, 5, 0), change batch size from 8 to 32 to 16|
 |2018/02/28|Ntest LV9(6, 0, 4), LV11(3, 6, 1), LV13(5, 5, 0)|
+|2018/03/01|Ntest LV9(2, 6, 2), LV11(1, 9, 0), LV13(2, 7, 1), disable resignation|
+|2018/03/02|Ntest LV9(6, 4, 0), LV11(4, 4, 2), LV13(4, 5, 1)|
+|2018/03/03|Ntest LV9(2, 3, 5), LV11(0, 10, 0), LV13(6, 4, 0)|
+|2018/03/06|Ntest LV9(3, 5, 2), LV11(0, 10, 0), LV13(3, 6, 1), LV15(0, 9, 1), change batch size from 16 to 256|
+|2018/03/07|Ntest LV9(5, 4, 1), LV11(1, 9, 0), LV13(2, 7, 1), LV15(2, 7, 1)|
+|2018/03/08|Ntest LV9(4, 6, 0), LV11(0, 10, 0), LV13(2, 8, 0), LV15(2, 8, 0)|
+
 
 
 ### loss graph
