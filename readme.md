@@ -78,6 +78,57 @@ Create `.env` file and write this.
 KERAS_BACKEND=tensorflow
 ```
 
+Windows Setup 
+-------------
+This instruction is written by @GCRhoads, Thanks!
+
+### Required: 64-bit windows
+
+##### Procedure verified for Windows 8.1.  Not yet tested for other versions.
+
+Note: Windows uses backslashes not forward slashes in path names.
+
+1. Change the first line (if necessary) of "src\reversi_zero\agent\player.py" to
+**from asyncio.futures import Future**
+
+2. **Install the 64-bit version of Python 3.5** (the 32-bit version is not sufficient).  You have two options
+   - [**Direct download page**](https://www.python.org/downloads/release/python-352/)
+   - **Anaconda with Python 3.5 (Recommended)** [instructions](https://docs.anaconda.com/anaconda/faq#how-do-i-get-anaconda-with-python-3-5)
+
+**Note:** For some strange reason, both Python 3.5 and Anaconda get installed in a hidden folder.  To access them, you first have to go to the Control Panel, select Folder Options, and on the View tab, click on the circle next to "Show hidden files, folders, or drives" in the Advanced settings section.  Anaconda gets installed in C:\ProgramData\Anaconda3\.  The direct download option installs Python in (I believe) C:\Users\\<your user name>\AppData\Local\Program\Python\.
+
+3. **Install Visual C++ 2015 build tools.** You could install the entire 2015 version (not the 2017 version that Microsoft tries to force on you) of Visual Studio but this is a large download and install, most of which you don't need. [Download visual C++ build tools](http://go.microsoft.com/fwlink/?LinkId=691126).  Double-click on the downloaded file to run the installer.
+
+4. **Rewrite all uses of an f-strings**.  The python source code for this project uses numerous f-strings, a feature new to Python 3.6.  Since we need Python 3.5 (required by the windows version of tensorflow), use your editor's search feature to find every occurrence of an f-string and rewrite it using string.format().
+
+5. **Install the libraries**  From either the Anaconda prompt or from a command window in the top level folder where you put this distribution, enter the following.
+
+```bash
+pip install -r requirements.txt
+```
+
+6. **Install tensor-flow**
+
+If you have a gpu compatible with tensor-flow (see the list on the tensor-flow web site), then your code will execute much faster if you install the gpu version.  To install the gpu-version enter the following in either the Anaconda prompt or the command window.
+
+```bash
+pip3 install -- upgrade tensorflow-gpu
+```
+
+If you do not have a compatible gpu, then you will have to settle for the slow cpu-only version.  To install this, enter the following in either the Anaconda prompt or the command window.
+
+```bash
+pip3 install -- upgrade tensorflow
+```
+7. **set environment variables**  Create a `.env` file and write the following line in this file.
+
+```text:.env
+KERAS_BACKEND=tensorflow
+```
+
+Now you should be good to go.
+
+
 Strongest Model
 ---------------
 Now, "challenge 5 model" and "ch5 config" are strongest in my models.
