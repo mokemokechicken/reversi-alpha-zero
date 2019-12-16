@@ -56,7 +56,7 @@ scipy==1.0.0
 simplegeneric==0.8.1
 six==1.11.0
 tensorboard==1.0.0a6
-tensorflow==1.4.1
+tensorflow==1.15.0
 terminado==0.6
 testpath==0.3.1
 tornado==4.5.2
